@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>ZaPTUre Studio — Create Your Ad</title>
+  <meta name="description" content="ZaPTUre AI Studio — Generate stunning poster and video advertisements with AI in four simple steps."/>
+  <link rel="stylesheet" href="styles/main.css"/>
+  <link rel="stylesheet" href="styles/studio.css"/>
+</head>
+<body class="studio-body">
+
+<!-- ── STUDIO HEADER ── -->
+<header class="studio-header">
+  <a href="index.html" class="back-link">← Back to Home</a>
+  <div class="nav-logo">
+    <div class="logo-icon">Z</div>
+    ZaPTUre<span style="color:var(--text)">AI</span>
+  </div>
+  <div style="width:100px;text-align:right;font-size:0.82rem;color:var(--text-muted);" id="trialBadge">
+    ✨ 1 free credit
+  </div>
+</header>
+
+<!-- ── PROGRESS ── -->
+<div class="progress-container">
+  <div class="progress-steps">
+    <div class="progress-step">
+      <div class="step-circle active" id="sc1">1</div>
+      <div class="step-label">Format</div>
+    </div>
+    <div class="step-connector" id="conn1"></div>
+    <div class="progress-step">
+      <div class="step-circle" id="sc2">2</div>
+      <div class="step-label">Describe</div>
+    </div>
+    <div class="step-connector" id="conn2"></div>
+    <div class="progress-step">
+      <div class="step-circle" id="sc3">3</div>
+      <div class="step-label">Style</div>
+    </div>
+    <div class="step-connector" id="conn3"></div>
+    <div class="progress-step">
+      <div class="step-circle" id="sc4">4</div>
+      <div class="step-label">Generate</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── STUDIO MAIN ── -->
+<main class="studio-main">
+
+  <!-- ═══ STEP 1: FORMAT ═══ -->
+  <div class="step-panel active" id="step1">
+    <div class="step-heading">
+      <h2>What would you like to create?</h2>
+      <p>Choose the format that fits your campaign goals.</p>
+    </div>
+
+    <div class="format-grid">
+      <div class="format-card" data-format="poster" id="formatPoster">
+        <div class="format-check">✓</div>
+        <span class="format-emoji">🖼️</span>
+        <h3>Ad Poster</h3>
+        <p>A high-resolution image ad for social media, print, or digital displays.</p>
+        <div class="format-badge">PNG Export</div>
+      </div>
+      <div class="format-card" data-format="video" id="formatVideo">
+        <div class="format-check">✓</div>
+        <span class="format-emoji">🎬</span>
+        <h3>Video Ad</h3>
+        <p>A 15 or 30-second animated video ad with voiceover and background music.</p>
+        <div class="format-badge">MP4 Preview</div>
+      </div>
+    </div>
+
+    <div class="step-nav">
+      <span></span>
+      <button class="btn btn-primary" onclick="nextStep()">Next: Describe Your Ad →</button>
+    </div>
+  </div>
+
+  <!-- ═══ STEP 2: DESCRIBE ═══ -->
+  <div class="step-panel" id="step2">
+    <div class="step-heading">
+      <h2>Describe your advertisement</h2>
+      <p>The more detail you give, the better your ad will be.</p>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="promptInput">
+        Ad Prompt <span>* required</span>
+        <span class="char-counter" id="charCounter">0/500</span>
+      </label>
+      <textarea
+        class="form-textarea" id="promptInput"
+        placeholder="e.g. A vibrant summer sale poster for my clothing brand 'SunWear'. Bright colours, beach vibes, promoting 50% off on all summer dresses. Target audience: young women aged 18-30."
+        maxlength="500"></textarea>
+      <div class="form-hint">Describe your product, target audience, key message and mood.</div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="headlineInput">
+        Main Headline <span>(optional — auto-generated if blank)</span>
+      </label>
+      <input type="text" class="form-input" id="headlineInput" placeholder="e.g. Summer Sale — Up to 50% Off!"/>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div class="form-group">
+        <label class="form-label" for="brandInput">Brand Name <span>(optional)</span></label>
+        <input type="text" class="form-input" id="brandInput" placeholder="e.g. SunWear"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="taglineInput">Tagline <span>(optional)</span></label>
+        <input type="text" class="form-input" id="taglineInput" placeholder="e.g. Wear the Sun"/>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Upload Images <span>(optional — up to 3)</span></label>
+      <div class="upload-zone" id="uploadZone">
+        <input type="file" id="fileInput" accept="image/*" multiple/>
+        <div class="upload-icon">📁</div>
+        <h4>Drag & drop your images here</h4>
+        <p>or</p>
+        <span class="upload-btn">Browse Files</span>
+        <p style="margin-top:10px;font-size:0.78rem;">PNG, JPG, WEBP · Max 3 images</p>
+      </div>
+      <div class="image-previews" id="imagePreviews"></div>
+    </div>
+
+    <div class="step-nav">
+      <button class="btn btn-outline" onclick="prevStep()">← Back</button>
+      <button class="btn btn-primary" onclick="nextStep()">Next: Style Options →</button>
+    </div>
+  </div>
+
+  <!-- ═══ STEP 3: STYLE ═══ -->
+  <div class="step-panel" id="step3">
+    <div class="step-heading">
+      <h2>Customise the style</h2>
+      <p>Make your ad match your brand's personality.</p>
+    </div>
+
+    <div id="step3Options">
+      <!-- Injected by renderStep3() -->
+    </div>
+
+    <div class="step-nav">
+      <button class="btn btn-outline" onclick="prevStep()">← Back</button>
+      <button class="btn btn-primary" onclick="nextStep()">Next: Review & Generate →</button>
+    </div>
+  </div>
+
+  <!-- ═══ STEP 4: GENERATE ═══ -->
+  <div class="step-panel" id="step4">
+    <div id="step4Content">
+      <div class="step-heading">
+        <h2>Review &amp; Generate</h2>
+        <p>Everything looks good? Hit generate and let the AI do its magic.</p>
+      </div>
+
+      <div class="generate-summary">
+        <h3>📋 Your Ad Summary</h3>
+        <div id="summaryContent"></div>
+      </div>
+
+      <div class="generate-btn-wrap">
+        <button class="btn btn-primary btn-lg" id="generateBtn" style="font-size:1.1rem;padding:18px 48px;">
+          ✨ Generate My Ad
+        </button>
+        <p style="margin-top:12px;font-size:0.82rem;color:var(--text-muted);">
+          This will use your 1 free generation credit
+        </p>
+      </div>
+
+      <div class="step-nav">
+        <button class="btn btn-outline" onclick="prevStep()">← Back</button>
+        <span></span>
+      </div>
+    </div>
+
+    <!-- Loading overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+      <div class="loading-spinner"></div>
+      <div class="loading-text">Creating your ad…</div>
+      <div class="loading-sub" id="loadingMsg">Analysing your prompt…</div>
+      <div class="loading-bar-wrap">
+        <div class="loading-bar-fill" id="loadingBar"></div>
+      </div>
+    </div>
+
+    <!-- Result -->
+    <div class="result-area" id="resultArea">
+      <div class="step-heading">
+        <h2>🎉 Your Ad is Ready!</h2>
+        <p>Download it or create another one.</p>
+      </div>
+
+      <div class="result-card">
+        <div class="result-header">
+          <h3>Generated Advertisement</h3>
+          <span class="result-type-badge" id="resultTypeBadge">Poster</span>
+        </div>
+        <div class="result-preview">
+          <div class="result-canvas-wrap">
+            <canvas id="resultCanvas"></canvas>
+          </div>
+          <div id="videoResultWrap" style="display:none;width:100%;max-width:540px;">
+            <div style="position:relative;border-radius:16px;overflow:hidden;box-shadow:0 12px 40px rgba(124,58,237,0.2);">
+              <canvas id="videoThumbCanvas" style="display:block;width:100%;height:auto;"></canvas>
+              <div class="play-button-overlay">
+                <div class="play-btn-circle">▶</div>
+              </div>
+            </div>
+            <p style="text-align:center;margin-top:16px;font-size:0.85rem;color:var(--text-muted);">
+              🎬 Video thumbnail preview — Full render available in Pro plan
+            </p>
+          </div>
+        </div>
+        <div class="result-actions">
+          <button class="btn btn-primary" id="downloadBtn">⬇️ Download</button>
+          <button class="btn btn-outline" id="createAnotherBtn">✨ Create Another</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ═══ PAYWALL MODAL ═══ -->
+<div class="modal-overlay" id="paywallOverlay">
+  <div class="paywall-modal">
+    <button class="modal-close" id="closePaywall">✕</button>
+    <div class="paywall-emoji">🔒</div>
+    <h2>Free Trial Used Up</h2>
+    <p>You've used your 1 free generation. Upgrade to <strong>ZaPTUre Pro</strong> for unlimited posters and video ads.</p>
+
+    <div class="paywall-plan">
+      <div class="paywall-plan-title">Pro Plan</div>
+      <div class="paywall-plan-price"><sup>$</sup>19<span>/month</span></div>
+      <ul class="paywall-features-list">
+        <li>Unlimited Posters &amp; Videos</li>
+        <li>HD &amp; 4K exports</li>
+        <li>Priority AI generation</li>
+        <li>Custom voice upload</li>
+        <li>Brand kit storage</li>
+        <li>Commercial licence</li>
+      </ul>
+    </div>
+
+    <button class="btn btn-primary" id="upgradeBtn" style="width:100%;justify-content:center;font-size:1rem;padding:16px;">
+      🚀 Upgrade to Pro — $19/mo
+    </button>
+
+    <!-- Mock Checkout Form -->
+    <div class="checkout-form" id="checkoutForm">
+      <div class="form-group" style="margin-bottom:14px;">
+        <label class="form-label" style="font-size:0.85rem;">Card Number</label>
+        <input type="text" class="form-input" placeholder="4242 4242 4242 4242" maxlength="19" id="cardNum"
+          oninput="this.value=this.value.replace(/\D/g,'').replace(/(.{4})/g,'$1 ').trim()"/>
+      </div>
+      <div class="checkout-row">
+        <div class="form-group" style="margin-bottom:14px;">
+          <label class="form-label" style="font-size:0.85rem;">Expiry</label>
+          <input type="text" class="form-input" placeholder="MM / YY" maxlength="7"/>
+        </div>
+        <div class="form-group" style="margin-bottom:14px;">
+          <label class="form-label" style="font-size:0.85rem;">CVC</label>
+          <input type="text" class="form-input" placeholder="•••" maxlength="3"/>
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:16px;">
+        <label class="form-label" style="font-size:0.85rem;">Name on Card</label>
+        <input type="text" class="form-input" placeholder="Your Full Name"/>
+      </div>
+      <button class="btn btn-primary" id="checkoutSubmit" style="width:100%;justify-content:center;padding:14px;">
+        Pay $19/month
+      </button>
+      <div class="checkout-secure">🔒 256-bit SSL encryption · Demo only</div>
+    </div>
+
+    <p class="paywall-note">By upgrading you agree to our <a href="#">Terms of Service</a>. Cancel anytime.</p>
+  </div>
+</div>
+
+<script src="scripts/trial.js"></script>
+<script src="scripts/generator.js"></script>
+<script src="scripts/studio.js"></script>
+
+<script>
+  // Update trial badge
+  if (Trial.isUsed()) {
+    document.getElementById('trialBadge').innerHTML = '<span style="color:var(--danger);font-weight:600;">⚠️ Trial used</span>';
+  }
+</script>
+</body>
+</html>
