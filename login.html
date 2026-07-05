@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>ZaPTUre AI — Sign In</title>
+<meta name="description" content="Sign in to ZaPTUre AI and start creating stunning AI-powered advertisements in seconds."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#050508;--bg2:#0a0a12;--bg3:#0f0f1a;
+  --card:rgba(255,255,255,0.04);--cb:rgba(255,255,255,0.08);--cb2:rgba(255,255,255,0.14);
+  --text:#eeeaf8;--muted:rgba(238,234,248,0.5);--muted2:rgba(238,234,248,0.28);
+  --v1:#7b4fff;--v2:#a78bfa;--pk:#f0609e;
+  --g1:linear-gradient(135deg,#7b4fff,#f0609e);
+  --danger:#f87171;--r:14px;
+}
+html{overflow-x:hidden;height:100%}
+body{
+  font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);
+  min-height:100vh;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:24px;position:relative;overflow:hidden;
+}
+
+/* BG CANVAS */
+canvas{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0.5}
+
+/* BACK LINK */
+.back-bar{
+  position:fixed;top:0;left:0;right:0;z-index:10;
+  padding:18px 40px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(5,5,8,0.7);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--cb);
+}
+.logo{
+  display:flex;align-items:center;gap:10px;
+  font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;
+  color:var(--text);text-decoration:none;letter-spacing:-0.02em;
+}
+.logo-z{
+  width:34px;height:34px;border-radius:10px;background:var(--g1);
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.95rem;color:#fff;font-weight:800;
+  box-shadow:0 0 20px rgba(123,79,255,0.5);
+}
+.logo span{background:var(--g1);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.back-link{
+  display:flex;align-items:center;gap:7px;
+  color:var(--muted);text-decoration:none;font-size:0.84rem;font-weight:500;
+  transition:color 0.2s;
+}
+.back-link:hover{color:var(--text)}
+.back-link svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* CARD */
+.card{
+  position:relative;z-index:1;
+  width:100%;max-width:420px;
+  background:rgba(10,10,18,0.9);
+  border:1px solid var(--cb);border-radius:24px;
+  padding:44px 40px;
+  box-shadow:0 40px 100px rgba(0,0,0,0.6),0 0 60px rgba(123,79,255,0.1);
+  backdrop-filter:blur(24px);
+  animation:slideUp 0.5s cubic-bezier(0.22,1,0.36,1) both;
+}
+.card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:var(--g1);border-radius:24px 24px 0 0;
+}
+@keyframes slideUp{from{opacity:0;transform:translateY(32px)}to{opacity:1;transform:translateY(0)}}
+
+/* GLOW */
+.card-glow{
+  position:absolute;top:-60px;left:50%;transform:translateX(-50%);
+  width:300px;height:180px;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse,rgba(123,79,255,0.22),transparent 70%);
+  filter:blur(30px);
+}
+
+/* HEADER */
+.card-head{text-align:center;margin-bottom:36px;position:relative;z-index:1}
+.card-ico{
+  font-size:2.4rem;display:block;margin-bottom:16px;
+  animation:iconPop 0.6s 0.2s cubic-bezier(0.22,1,0.36,1) both;
+}
+@keyframes iconPop{from{opacity:0;transform:scale(0.5)}to{opacity:1;transform:scale(1)}}
+.card-head h1{
+  font-family:'Syne',sans-serif;font-size:1.75rem;font-weight:800;
+  letter-spacing:-0.035em;margin-bottom:8px;
+}
+.card-head p{font-size:0.88rem;color:var(--muted);line-height:1.6}
+
+/* TABS */
+.tabs{
+  display:flex;background:rgba(255,255,255,0.04);
+  border:1px solid var(--cb);border-radius:100px;
+  padding:4px;margin-bottom:32px;
+}
+.tab{
+  flex:1;padding:9px 0;border-radius:100px;text-align:center;
+  font-size:0.84rem;font-weight:600;color:var(--muted);
+  cursor:pointer;transition:all 0.28s cubic-bezier(0.22,1,0.36,1);
+  user-select:none;
+}
+.tab.active{
+  background:var(--g1);color:#fff;
+  box-shadow:0 0 20px rgba(123,79,255,0.4);
+}
+
+/* FORM */
+.form-grp{margin-bottom:18px;position:relative;z-index:1}
+.form-label{
+  display:block;font-size:0.8rem;font-weight:600;
+  color:var(--text);margin-bottom:8px;letter-spacing:0.01em;
+}
+.form-input{
+  width:100%;background:rgba(255,255,255,0.04);
+  border:1px solid var(--cb);border-radius:var(--r);
+  padding:13px 16px;font-size:0.9rem;color:var(--text);
+  font-family:'Inter',sans-serif;outline:none;
+  transition:border-color 0.25s,background 0.25s,box-shadow 0.25s;
+}
+.form-input:focus{
+  border-color:rgba(123,79,255,0.55);
+  background:rgba(123,79,255,0.05);
+  box-shadow:0 0 0 3px rgba(123,79,255,0.12);
+}
+.form-input::placeholder{color:var(--muted2)}
+.form-input.has-icon{padding-left:44px}
+.input-wrap{position:relative}
+.input-ico{
+  position:absolute;left:15px;top:50%;transform:translateY(-50%);
+  font-size:1rem;pointer-events:none;opacity:0.5;
+}
+.form-hint{font-size:0.73rem;color:var(--muted2);margin-top:6px}
+
+/* PASSWORD TOGGLE */
+.pw-toggle{
+  position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  background:none;border:none;cursor:pointer;color:var(--muted);
+  font-size:0.8rem;transition:color 0.2s;padding:4px;
+}
+.pw-toggle:hover{color:var(--text)}
+
+/* FORGOT */
+.forgot{
+  display:block;text-align:right;font-size:0.77rem;
+  color:var(--v2);text-decoration:none;margin-top:-10px;margin-bottom:18px;
+  transition:color 0.2s;
+}
+.forgot:hover{color:#c4b5fd}
+
+/* DIVIDER */
+.divider{
+  display:flex;align-items:center;gap:14px;
+  margin:22px 0;
+}
+.divider::before,.divider::after{
+  content:'';flex:1;height:1px;background:var(--cb);
+}
+.divider span{font-size:0.75rem;color:var(--muted2);white-space:nowrap}
+
+/* SOCIAL BUTTONS */
+.social-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:4px}
+.social-btn{
+  display:flex;align-items:center;justify-content:center;gap:9px;
+  padding:11px 0;border-radius:var(--r);
+  background:rgba(255,255,255,0.04);border:1px solid var(--cb);
+  color:var(--text);font-size:0.84rem;font-weight:500;
+  cursor:pointer;transition:background 0.2s,border-color 0.2s,transform 0.2s;
+  font-family:'Inter',sans-serif;
+}
+.social-btn:hover{background:rgba(255,255,255,0.08);border-color:var(--cb2);transform:translateY(-1px)}
+.social-ico{font-size:1.1rem}
+
+/* PRIMARY BUTTON */
+.btn-primary{
+  width:100%;display:flex;align-items:center;justify-content:center;gap:8px;
+  padding:14px 24px;border-radius:100px;
+  background:var(--g1);color:#fff;font-size:0.92rem;font-weight:700;
+  border:none;cursor:pointer;font-family:'Inter',sans-serif;
+  box-shadow:0 0 28px rgba(123,79,255,0.45),0 4px 16px rgba(0,0,0,0.3);
+  transition:all 0.25s cubic-bezier(0.22,1,0.36,1);
+  position:relative;overflow:hidden;margin-bottom:4px;
+}
+.btn-primary::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,0.18),transparent);
+  opacity:0;transition:opacity 0.3s;
+}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 0 44px rgba(123,79,255,0.65),0 8px 24px rgba(0,0,0,0.4)}
+.btn-primary:hover::before{opacity:1}
+.btn-primary:disabled{opacity:0.55;cursor:not-allowed;transform:none}
+
+/* BOTTOM NOTE */
+.bottom-note{
+  text-align:center;font-size:0.76rem;color:var(--muted2);
+  margin-top:22px;line-height:1.7;
+}
+.bottom-note a{color:var(--v2);text-decoration:none;transition:color 0.2s}
+.bottom-note a:hover{color:#c4b5fd}
+
+/* ERROR */
+.err-msg{
+  font-size:0.78rem;color:var(--danger);
+  background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.2);
+  border-radius:10px;padding:10px 14px;margin-bottom:16px;
+  display:none;animation:slideUp 0.3s ease both;
+}
+.err-msg.show{display:block}
+
+/* SIGNUP EXTRA FIELDS */
+.signup-extra{display:none}
+.signup-extra.show{display:block;animation:fadeIn 0.3s ease both}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* SUCCESS STATE */
+.success-state{
+  display:none;text-align:center;padding:20px 0;
+  animation:slideUp 0.4s ease both;
+}
+.success-state.show{display:block}
+.success-ico{font-size:3.5rem;display:block;margin-bottom:16px}
+.success-state h2{font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;letter-spacing:-0.03em;margin-bottom:10px}
+.success-state p{font-size:0.88rem;color:var(--muted);margin-bottom:24px;line-height:1.65}
+.redirect-bar{
+  height:3px;border-radius:2px;background:rgba(255,255,255,0.08);
+  margin-bottom:20px;overflow:hidden;
+}
+.redirect-fill{
+  height:100%;background:var(--g1);width:0%;
+  animation:fillBar 2s ease forwards;
+}
+@keyframes fillBar{to{width:100%}}
+
+@media(max-width:480px){
+  .card{padding:32px 24px}
+  .back-bar{padding:14px 20px}
+  .social-row{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<canvas id="bgC"></canvas>
+
+<div class="back-bar">
+  <a href="index.html" class="logo">
+    <div class="logo-z">Z</div>
+    ZaPTUre<span>AI</span>
+  </a>
+  <a href="index.html" class="back-link">
+    <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+    Back to Home
+  </a>
+</div>
+
+<div class="card-glow"></div>
+
+<div class="card" role="main">
+  <div class="card-head">
+    <span class="card-ico" id="cardIco">✨</span>
+    <h1 id="cardTitle">Welcome Back</h1>
+    <p id="cardSub">Sign in to your ZaPTUre AI account</p>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs" role="tablist">
+    <div class="tab active" id="tabLogin" role="tab" onclick="switchTab('login')">Sign In</div>
+    <div class="tab" id="tabSignup" role="tab" onclick="switchTab('signup')">Sign Up</div>
+  </div>
+
+  <!-- ERROR -->
+  <div class="err-msg" id="errMsg" role="alert"></div>
+
+  <!-- FORM -->
+  <form id="authForm" onsubmit="handleSubmit(event)" novalidate>
+
+    <!-- SIGNUP ONLY: Name -->
+    <div class="form-grp signup-extra" id="nameGrp">
+      <label class="form-label" for="nameIn">Full Name</label>
+      <div class="input-wrap">
+        <span class="input-ico">👤</span>
+        <input class="form-input has-icon" type="text" id="nameIn" placeholder="e.g. Alex Johnson" autocomplete="name"/>
+      </div>
+    </div>
+
+    <!-- EMAIL -->
+    <div class="form-grp">
+      <label class="form-label" for="emailIn">Email Address</label>
+      <div class="input-wrap">
+        <span class="input-ico">✉️</span>
+        <input class="form-input has-icon" type="email" id="emailIn" placeholder="you@example.com" autocomplete="email" required/>
+      </div>
+    </div>
+
+    <!-- PASSWORD -->
+    <div class="form-grp">
+      <label class="form-label" for="pwIn">Password</label>
+      <div class="input-wrap">
+        <span class="input-ico">🔐</span>
+        <input class="form-input has-icon" type="password" id="pwIn" placeholder="Enter your password" autocomplete="current-password" required/>
+        <button type="button" class="pw-toggle" id="pwToggle" onclick="togglePw()" title="Show/hide password">👁</button>
+      </div>
+    </div>
+
+    <!-- SIGNUP ONLY: Confirm Password -->
+    <div class="form-grp signup-extra" id="confirmGrp">
+      <label class="form-label" for="confirmIn">Confirm Password</label>
+      <div class="input-wrap">
+        <span class="input-ico">🔐</span>
+        <input class="form-input has-icon" type="password" id="confirmIn" placeholder="Re-enter password" autocomplete="new-password"/>
+      </div>
+    </div>
+
+    <!-- FORGOT (login only) -->
+    <a href="#" class="forgot" id="forgotLink">Forgot password?</a>
+
+    <button type="submit" class="btn-primary" id="submitBtn">
+      <span id="btnText">Sign In →</span>
+    </button>
+  </form>
+
+  <div class="divider"><span>or continue with</span></div>
+
+  <div class="social-row">
+    <button class="social-btn" onclick="socialLogin('Google')">
+      <span class="social-ico">🌐</span> Google
+    </button>
+    <button class="social-btn" onclick="socialLogin('GitHub')">
+      <span class="social-ico">🐙</span> GitHub
+    </button>
+  </div>
+
+  <!-- SUCCESS STATE -->
+  <div class="success-state" id="successState">
+    <span class="success-ico">🎉</span>
+    <h2 id="successTitle">You're in!</h2>
+    <p id="successMsg">Redirecting you to the studio…</p>
+    <div class="redirect-bar"><div class="redirect-fill" id="redirectFill"></div></div>
+  </div>
+
+  <p class="bottom-note" id="bottomNote">
+    Don't have an account? <a href="#" onclick="switchTab('signup');return false">Sign up — it's free</a>
+  </p>
+</div>
+
+<script>
+/* ── PARTICLE BG ── */
+const cv=document.getElementById('bgC'),cx=cv.getContext('2d');
+let W,H,dots=[];
+function rsz(){W=cv.width=window.innerWidth;H=cv.height=window.innerHeight}
+rsz();window.addEventListener('resize',rsz);
+class Dot{
+  constructor(){this.reset()}
+  reset(){
+    this.x=Math.random()*W;this.y=Math.random()*H;
+    this.r=Math.random()*1.3+0.3;
+    this.vx=(Math.random()-0.5)*0.22;this.vy=(Math.random()-0.5)*0.22;
+    this.a=Math.random();this.f=Math.random()>0.5?0.003:-0.003;
+    const c=[[123,79,255],[240,96,158],[34,211,238]];
+    this.c=c[Math.floor(Math.random()*c.length)];
+  }
+  tick(){
+    this.x+=this.vx;this.y+=this.vy;
+    this.a+=this.f;if(this.a<=0||this.a>=1)this.f*=-1;
+    if(this.x<0||this.x>W||this.y<0||this.y>H)this.reset();
+  }
+  draw(){cx.beginPath();cx.arc(this.x,this.y,this.r,0,Math.PI*2);cx.fillStyle=`rgba(${this.c},${this.a*0.75})`;cx.fill()}
+}
+for(let i=0;i<100;i++)dots.push(new Dot());
+(function lp(){cx.clearRect(0,0,W,H);dots.forEach(d=>{d.tick();d.draw()});requestAnimationFrame(lp)})();
+
+/* ── TAB SWITCH ── */
+let currentTab='login';
+function switchTab(tab){
+  currentTab=tab;
+  const isLogin=tab==='login';
+  document.getElementById('tabLogin').classList.toggle('active',isLogin);
+  document.getElementById('tabSignup').classList.toggle('active',!isLogin);
+  document.querySelectorAll('.signup-extra').forEach(el=>el.classList.toggle('show',!isLogin));
+  document.getElementById('forgotLink').style.display=isLogin?'block':'none';
+  document.getElementById('btnText').textContent=isLogin?'Sign In →':'Create Account →';
+  document.getElementById('cardTitle').textContent=isLogin?'Welcome Back':'Create Account';
+  document.getElementById('cardSub').textContent=isLogin?'Sign in to your ZaPTUre AI account':'Join ZaPTUre AI and start creating';
+  document.getElementById('cardIco').textContent=isLogin?'✨':'🚀';
+  document.getElementById('bottomNote').innerHTML=isLogin
+    ?`Don't have an account? <a href="#" onclick="switchTab('signup');return false">Sign up — it's on us</a>`
+    :`Already have an account? <a href="#" onclick="switchTab('login');return false">Sign in</a>`;
+  document.getElementById('errMsg').classList.remove('show');
+  document.getElementById('pwIn').setAttribute('autocomplete', isLogin?'current-password':'new-password');
+}
+
+/* ── PASSWORD TOGGLE ── */
+function togglePw(){
+  const inp=document.getElementById('pwIn');
+  const btn=document.getElementById('pwToggle');
+  const show=inp.type==='password';
+  inp.type=show?'text':'password';
+  btn.textContent=show?'🙈':'👁';
+}
+
+/* ── FORM SUBMIT ── */
+function handleSubmit(e){
+  e.preventDefault();
+  const email=document.getElementById('emailIn').value.trim();
+  const pw=document.getElementById('pwIn').value;
+  const err=document.getElementById('errMsg');
+
+  if(!email||!pw){
+    showErr('Please fill in all required fields.');return;
+  }
+  if(!/\S+@\S+\.\S+/.test(email)){
+    showErr('Please enter a valid email address.');return;
+  }
+  if(pw.length<6){
+    showErr('Password must be at least 6 characters.');return;
+  }
+  if(currentTab==='signup'){
+    const confirm=document.getElementById('confirmIn').value;
+    if(pw!==confirm){showErr('Passwords do not match.');return;}
+    const name=document.getElementById('nameIn').value.trim();
+    if(!name){showErr('Please enter your full name.');return;}
+  }
+
+  err.classList.remove('show');
+  const btn=document.getElementById('submitBtn');
+  btn.disabled=true;
+  document.getElementById('btnText').textContent='Authenticating…';
+
+  setTimeout(()=>{
+    // Save mock session
+    localStorage.setItem('zapture_user',JSON.stringify({email,name:document.getElementById('nameIn')?.value||email.split('@')[0]}));
+    showSuccess();
+  },1600);
+}
+
+function showErr(msg){
+  const el=document.getElementById('errMsg');
+  el.textContent=msg;el.classList.add('show');
+}
+
+function showSuccess(){
+  document.getElementById('authForm').style.display='none';
+  document.querySelector('.tabs').style.display='none';
+  document.querySelector('.divider').style.display='none';
+  document.querySelector('.social-row').style.display='none';
+  document.getElementById('bottomNote').style.display='none';
+  document.getElementById('errMsg').style.display='none';
+
+  const ss=document.getElementById('successState');
+  ss.classList.add('show');
+  document.getElementById('successTitle').textContent=currentTab==='signup'?'Account Created!':'You\'re in!';
+  document.getElementById('successMsg').textContent='Redirecting you to the studio…';
+
+  setTimeout(()=>{window.location.href='studio.html';},2200);
+}
+
+function socialLogin(provider){
+  const btn=event.currentTarget;
+  btn.textContent='Connecting…';btn.disabled=true;
+  setTimeout(()=>{
+    localStorage.setItem('zapture_user',JSON.stringify({email:'demo@zapture.ai',name:'Demo User'}));
+    showSuccess();
+  },1400);
+}
+</script>
+</body>
+</html>

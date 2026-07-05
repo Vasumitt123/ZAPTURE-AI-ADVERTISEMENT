@@ -1,254 +1,771 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>ZaPTUre AI — Create Stunning Ads in Seconds</title>
-  <meta name="description" content="Generate beautiful AI-powered advertisement posters and videos from a simple text prompt. No design skills needed. Try free today."/>
-  <link rel="stylesheet" href="styles/main.css"/>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>ZaPTUre AI — Create Stunning Ads in Seconds</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@500;600;700&family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#050508;
+  --bg2:#0a0a12;
+  --bg3:#0f0f1a;
+  --card:rgba(255,255,255,0.04);
+  --card-border:rgba(255,255,255,0.08);
+  --card-hover:rgba(255,255,255,0.07);
+  --text:#eeeaf8;
+  --muted:rgba(238,234,248,0.5);
+  --muted2:rgba(238,234,248,0.28);
+  --v1:#7b4fff;
+  --v2:#a855f7;
+  --pk:#f0609e;
+  --cy:#22d3ee;
+  --gold:#f59e0b;
+  --g1:linear-gradient(135deg,#7b4fff,#f0609e);
+  --g2:linear-gradient(135deg,#22d3ee,#7b4fff);
+  --g3:linear-gradient(180deg,#7b4fff22,transparent);
+  --r:18px;
+}
+html{scroll-behavior:smooth;scroll-padding-top:80px}
+body{
+  font-family:'Inter',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  overflow-x:hidden;
+  line-height:1.65;
+}
+
+/* CANVAS BACKGROUND */
+#bgCanvas{
+  position:fixed;inset:0;z-index:0;
+  pointer-events:none;opacity:0.6;
+}
+
+/* SCROLL PROGRESS */
+#spbar{
+  position:fixed;top:0;left:0;height:2px;z-index:999;
+  background:var(--g1);width:0%;transition:width 0.1s linear;
+}
+
+/* NAVBAR */
+.nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:20px 56px;
+  transition:background 0.4s,backdrop-filter 0.4s,border 0.4s;
+}
+.nav.solid{
+  background:rgba(5,5,8,0.82);
+  backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--card-border);
+}
+.logo{
+  display:flex;align-items:center;gap:11px;
+  font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;
+  color:var(--text);text-decoration:none;letter-spacing:-0.02em;
+}
+.logo-z{
+  width:38px;height:38px;border-radius:11px;
+  background:var(--g1);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.1rem;color:#fff;font-weight:800;
+  box-shadow:0 0 24px rgba(123,79,255,0.55),0 0 8px rgba(240,96,158,0.3);
+  transition:box-shadow 0.3s;
+}
+.logo:hover .logo-z{box-shadow:0 0 36px rgba(123,79,255,0.8),0 0 16px rgba(240,96,158,0.5)}
+.logo span{background:var(--g1);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav-links{display:flex;gap:36px}
+.nav-links a{
+  color:var(--muted);text-decoration:none;font-size:0.88rem;font-weight:500;
+  letter-spacing:0.01em;transition:color 0.2s;position:relative;
+}
+.nav-links a::after{
+  content:'';position:absolute;bottom:-3px;left:0;right:0;height:1px;
+  background:var(--g1);transform:scaleX(0);transition:transform 0.3s;
+}
+.nav-links a:hover{color:var(--text)}
+.nav-links a:hover::after{transform:scaleX(1)}
+.nav-cta{display:flex;gap:10px;align-items:center}
+
+/* BUTTONS */
+.btn{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:11px 24px;border-radius:100px;
+  font-size:0.87rem;font-weight:600;letter-spacing:0.01em;
+  text-decoration:none;cursor:pointer;border:none;
+  transition:all 0.25s cubic-bezier(0.22,1,0.36,1);
+  font-family:'Inter',sans-serif;white-space:nowrap;
+  position:relative;overflow:hidden;
+}
+.btn-ghost{color:var(--muted);background:transparent}
+.btn-ghost:hover{color:var(--text)}
+.btn-outline{
+  color:var(--text);
+  background:rgba(255,255,255,0.055);
+  border:1px solid var(--card-border);
+  backdrop-filter:blur(8px);
+}
+.btn-outline:hover{background:rgba(255,255,255,0.09);border-color:rgba(255,255,255,0.18);transform:translateY(-1px)}
+.btn-primary{
+  background:var(--g1);color:#fff;
+  box-shadow:0 0 28px rgba(123,79,255,0.4),0 4px 16px rgba(0,0,0,0.3);
+}
+.btn-primary::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,0.18),transparent);
+  opacity:0;transition:opacity 0.3s;
+}
+.btn-primary:hover{
+  transform:translateY(-2px);
+  box-shadow:0 0 44px rgba(123,79,255,0.65),0 8px 24px rgba(0,0,0,0.4);
+}
+.btn-primary:hover::before{opacity:1}
+.btn-lg{padding:16px 40px;font-size:1rem;border-radius:100px}
+.btn-sm{padding:9px 20px;font-size:0.82rem}
+.btn-white{background:#fff;color:#7b4fff;box-shadow:0 0 32px rgba(255,255,255,0.2)}
+.btn-white:hover{transform:translateY(-2px);box-shadow:0 0 48px rgba(255,255,255,0.35)}
+
+/* HERO */
+.hero{
+  min-height:100vh;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  text-align:center;
+  padding:140px 24px 100px;
+  position:relative;z-index:1;
+}
+.hero-glow{
+  position:absolute;top:20%;left:50%;transform:translateX(-50%);
+  width:800px;height:500px;
+  background:radial-gradient(ellipse,rgba(123,79,255,0.18) 0%,rgba(240,96,158,0.08) 50%,transparent 75%);
+  pointer-events:none;filter:blur(40px);
+  animation:glowPulse 6s ease-in-out infinite;
+}
+@keyframes glowPulse{0%,100%{opacity:0.7;transform:translateX(-50%) scale(1)}50%{opacity:1;transform:translateX(-50%) scale(1.08)}}
+
+.hero-badge{
+  display:inline-flex;align-items:center;gap:9px;
+  padding:8px 18px 8px 10px;border-radius:100px;
+  background:rgba(123,79,255,0.12);
+  border:1px solid rgba(123,79,255,0.28);
+  font-size:0.78rem;font-weight:600;color:rgba(167,139,250,0.95);
+  margin-bottom:36px;
+  animation:fadeUp 0.9s ease both;
+  letter-spacing:0.04em;
+}
+.badge-dot{
+  width:22px;height:22px;border-radius:50%;
+  background:var(--g1);
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.7rem;
+  box-shadow:0 0 10px rgba(123,79,255,0.6);
+  animation:dotPulse 2.5s ease-in-out infinite;
+}
+@keyframes dotPulse{0%,100%{box-shadow:0 0 10px rgba(123,79,255,0.6)}50%{box-shadow:0 0 20px rgba(123,79,255,0.9),0 0 40px rgba(123,79,255,0.4)}}
+
+.hero-title{
+  font-family:'Syne',sans-serif;
+  font-size:clamp(3.2rem,7.5vw,6.5rem);
+  font-weight:800;
+  line-height:1.0;
+  letter-spacing:-0.045em;
+  max-width:960px;
+  animation:fadeUp 0.9s 0.12s ease both;
+  margin-bottom:30px;
+}
+.hero-title .line{display:block}
+.gt{
+  background:var(--g1);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+  position:relative;
+}
+.gt2{
+  background:var(--g2);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+
+.hero-sub{
+  max-width:560px;font-size:1.08rem;
+  color:var(--muted);line-height:1.75;
+  animation:fadeUp 0.9s 0.22s ease both;
+  margin-bottom:44px;
+}
+.hero-actions{
+  display:flex;gap:14px;flex-wrap:wrap;justify-content:center;
+  animation:fadeUp 0.9s 0.32s ease both;
+  margin-bottom:24px;
+}
+.hero-note{
+  font-size:0.78rem;color:var(--muted2);
+  animation:fadeUp 0.9s 0.42s ease both;
+  margin-bottom:80px;
+}
+.hero-note strong{color:rgba(167,139,250,0.8)}
+
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(28px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+/* LIVE PREVIEW WINDOW */
+.preview-wrap{
+  width:100%;max-width:960px;
+  animation:fadeUp 0.9s 0.52s ease both;
+  position:relative;
+}
+.preview-wrap::before{
+  content:'';position:absolute;inset:-1px;
+  background:var(--g1);border-radius:22px;
+  filter:blur(1px);opacity:0.5;z-index:-1;
+  animation:borderGlow 4s ease-in-out infinite;
+}
+@keyframes borderGlow{0%,100%{opacity:0.35}50%{opacity:0.65}}
+.preview-win{
+  background:rgba(10,10,18,0.95);
+  border:1px solid rgba(123,79,255,0.25);
+  border-radius:20px;overflow:hidden;
+  backdrop-filter:blur(20px);
+  box-shadow:0 40px 100px rgba(0,0,0,0.7),0 0 60px rgba(123,79,255,0.12);
+}
+.win-bar{
+  display:flex;align-items:center;gap:8px;
+  padding:14px 20px;
+  background:rgba(255,255,255,0.03);
+  border-bottom:1px solid rgba(255,255,255,0.06);
+}
+.dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+.dot.r{background:#ff5f57}.dot.y{background:#febc2e}.dot.g{background:#28c840}
+.win-url{
+  flex:1;margin:0 14px;
+  background:rgba(255,255,255,0.05);border-radius:7px;
+  padding:5px 14px;font-size:0.73rem;color:var(--muted2);
+  font-family:'Inter',monospace;text-align:left;
+}
+.win-body{
+  display:grid;grid-template-columns:220px 1fr;
+  min-height:360px;
+}
+.win-sidebar{
+  border-right:1px solid rgba(255,255,255,0.05);
+  padding:20px 14px;display:flex;flex-direction:column;gap:4px;
+}
+.sb-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;border-radius:10px;
+  font-size:0.8rem;color:var(--muted);cursor:pointer;
+  transition:background 0.2s,color 0.2s;
+}
+.sb-item:hover{background:rgba(255,255,255,0.05);color:var(--text)}
+.sb-item.active{background:rgba(123,79,255,0.14);color:#a78bfa}
+.sb-dot{
+  width:8px;height:8px;border-radius:50%;
+  background:currentColor;opacity:0.5;flex-shrink:0;
+}
+.win-main{padding:24px 28px;display:flex;flex-direction:column;gap:16px}
+
+/* AD PREVIEW CARD */
+.ad-preview{
+  border-radius:14px;overflow:hidden;position:relative;
+  background:var(--g1);padding:28px 24px;
+  box-shadow:0 8px 32px rgba(123,79,255,0.3);
+  animation:cardBreath 5s ease-in-out infinite;
+}
+@keyframes cardBreath{0%,100%{filter:brightness(1)}50%{filter:brightness(1.08)}}
+.ad-preview::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,0.12) 0%,transparent 60%);
+  pointer-events:none;
+}
+.ad-ai-badge{
+  position:absolute;top:14px;right:14px;
+  background:rgba(0,0,0,0.25);backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,0.2);
+  border-radius:100px;padding:4px 11px;
+  font-size:0.68rem;font-weight:700;color:#fff;letter-spacing:0.04em;
+}
+.ad-eyebrow{font-size:0.65rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;opacity:0.65;margin-bottom:10px}
+.ad-h{
+  font-family:'Syne',sans-serif;font-size:1.55rem;font-weight:800;
+  line-height:1.15;margin-bottom:10px;
+}
+.ad-sub{font-size:0.8rem;opacity:0.75;margin-bottom:18px;line-height:1.5}
+.ad-cta{
+  display:inline-block;
+  background:rgba(255,255,255,0.18);
+  border:1px solid rgba(255,255,255,0.32);
+  border-radius:100px;padding:8px 20px;
+  font-size:0.78rem;font-weight:700;color:#fff;
+  backdrop-filter:blur(6px);letter-spacing:0.02em;
+}
+
+/* STATS ROW */
+.stats-row{display:flex;gap:12px}
+.stat{
+  flex:1;background:rgba(255,255,255,0.035);
+  border:1px solid rgba(255,255,255,0.07);
+  border-radius:12px;padding:14px 12px;
+  transition:border-color 0.3s;
+}
+.stat:hover{border-color:rgba(123,79,255,0.3)}
+.stat-n{
+  font-family:'Syne',sans-serif;font-size:1.25rem;font-weight:800;
+  background:var(--g1);-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.stat-l{font-size:0.7rem;color:var(--muted2);margin-top:3px}
+
+/* TYPING */
+.typing-row{
+  display:flex;align-items:center;gap:12px;
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.06);
+  border-radius:12px;padding:13px 16px;
+}
+.typing-msg{font-size:0.8rem;color:var(--muted);flex:1;text-align:left}
+.typing-dots{display:flex;gap:4px;align-items:center}
+.td{
+  width:6px;height:6px;border-radius:50%;background:#a78bfa;
+  animation:td 1.4s ease-in-out infinite;
+}
+.td:nth-child(2){animation-delay:0.18s}
+.td:nth-child(3){animation-delay:0.36s}
+@keyframes td{0%,80%,100%{transform:scale(0.5);opacity:0.3}40%{transform:scale(1.1);opacity:1}}
+
+/* ═══ SECTIONS ═══ */
+.container{max-width:1100px;margin:0 auto;padding:0 24px}
+.section{padding:130px 0}
+.stag{
+  display:inline-block;font-size:0.72rem;font-weight:700;
+  letter-spacing:0.14em;text-transform:uppercase;
+  color:#a78bfa;margin-bottom:18px;
+}
+.stitle{
+  font-family:'Syne',sans-serif;
+  font-size:clamp(2.2rem,4.5vw,3.5rem);
+  font-weight:800;letter-spacing:-0.035em;line-height:1.07;
+  margin-bottom:18px;
+}
+.stitle-lg{
+  font-family:'Syne',sans-serif;
+  font-size:clamp(3rem,6vw,5rem);
+  font-weight:800;letter-spacing:-0.045em;line-height:1.02;
+  margin-bottom:18px;
+}
+.ssub{
+  font-size:1rem;color:var(--muted);max-width:480px;
+  line-height:1.75;margin-bottom:70px;
+}
+
+/* HOW IT WORKS */
+.steps-track{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:1px;
+  background:rgba(255,255,255,0.06);
+  border-radius:var(--r);overflow:hidden;
+}
+.step{
+  background:var(--bg2);padding:36px 28px;
+  position:relative;overflow:hidden;
+  transition:background 0.35s;
+}
+.step:hover{background:rgba(123,79,255,0.07)}
+.step::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:var(--g1);transform:scaleX(0);transform-origin:left;
+  transition:transform 0.5s cubic-bezier(0.22,1,0.36,1);
+}
+.step:hover::before{transform:scaleX(1)}
+.step-n{
+  font-family:'Syne',sans-serif;font-size:2.6rem;font-weight:800;
+  background:var(--g1);-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  opacity:0.35;line-height:1;margin-bottom:18px;
+  transition:opacity 0.3s;
+}
+.step:hover .step-n{opacity:0.7}
+.step-ico{font-size:1.8rem;display:block;margin-bottom:14px}
+.step h3{
+  font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;
+  margin-bottom:10px;
+}
+.step p{font-size:0.85rem;color:var(--muted);line-height:1.65}
+
+/* FEATURES */
+.feat-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:20px;
+}
+.feat{
+  background:var(--card);
+  border:1px solid var(--card-border);
+  border-radius:var(--r);padding:32px 28px;
+  position:relative;overflow:hidden;
+  transition:border-color 0.35s,transform 0.35s,background 0.35s;
+  cursor:default;
+}
+.feat::after{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at 50% 120%,rgba(123,79,255,0.12),transparent 60%);
+  opacity:0;transition:opacity 0.4s;
+}
+.feat:hover{
+  border-color:rgba(123,79,255,0.35);
+  transform:translateY(-5px);
+  background:var(--card-hover);
+}
+.feat:hover::after{opacity:1}
+.feat-ico{
+  width:50px;height:50px;border-radius:14px;
+  background:rgba(123,79,255,0.13);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.35rem;margin-bottom:20px;
+  transition:background 0.3s,transform 0.3s;
+}
+.feat:hover .feat-ico{background:rgba(123,79,255,0.22);transform:scale(1.08)}
+.feat h3{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;margin-bottom:10px}
+.feat p{font-size:0.87rem;color:var(--muted);line-height:1.65}
+
+/* PRICING */
+.price-grid{
+  display:grid;grid-template-columns:repeat(2,1fr);
+  gap:24px;max-width:740px;margin:0 auto;
+}
+.price-card{
+  background:var(--card);
+  border:1px solid var(--card-border);
+  border-radius:22px;padding:44px 40px;
+  position:relative;overflow:hidden;
+  transition:transform 0.35s,border-color 0.35s;
+}
+.price-card:hover{transform:translateY(-4px)}
+.price-card.hot{
+  border-color:rgba(123,79,255,0.4);
+  background:linear-gradient(160deg,rgba(123,79,255,0.09),rgba(240,96,158,0.04),var(--card));
+}
+.price-card.hot::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:var(--g1);
+}
+.price-pop{
+  position:absolute;top:22px;right:22px;
+  background:var(--g1);border-radius:100px;
+  padding:4px 13px;font-size:0.7rem;font-weight:700;color:#fff;
+  box-shadow:0 0 16px rgba(123,79,255,0.45);
+  letter-spacing:0.04em;
+}
+.price-plan{font-size:0.72rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:18px}
+.price-num{
+  font-family:'Syne',sans-serif;font-size:4rem;font-weight:800;
+  letter-spacing:-0.04em;line-height:1;margin-bottom:6px;
+}
+.price-num sup{font-size:1.5rem;vertical-align:super;font-weight:700}
+.price-per{font-size:0.83rem;color:var(--muted);margin-bottom:32px}
+.price-div{border:none;border-top:1px solid var(--card-border);margin-bottom:28px}
+.price-feats{list-style:none;display:flex;flex-direction:column;gap:13px;margin-bottom:36px}
+.price-feats li{
+  display:flex;align-items:flex-start;gap:11px;
+  font-size:0.88rem;color:var(--muted);
+}
+.price-check{
+  width:18px;height:18px;border-radius:50%;
+  background:rgba(123,79,255,0.18);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;margin-top:1px;
+  font-size:0.6rem;color:#a78bfa;font-weight:700;
+}
+
+/* TESTIMONIALS */
+.testi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.testi{
+  background:var(--card);border:1px solid var(--card-border);
+  border-radius:var(--r);padding:32px 28px;
+  position:relative;overflow:hidden;
+  transition:border-color 0.35s,transform 0.35s;
+}
+.testi::before{
+  content:'"';position:absolute;top:16px;right:24px;
+  font-family:'Syne',sans-serif;font-size:5rem;font-weight:800;
+  background:var(--g1);-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  opacity:0.12;line-height:1;
+}
+.testi:hover{border-color:rgba(123,79,255,0.3);transform:translateY(-4px)}
+.stars{color:var(--gold);font-size:0.85rem;letter-spacing:2px;margin-bottom:16px}
+.testi-q{font-size:0.92rem;color:var(--muted);line-height:1.78;margin-bottom:24px;font-style:italic}
+.testi-who{display:flex;align-items:center;gap:12px}
+.ava{
+  width:40px;height:40px;border-radius:50%;
+  background:var(--g1);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Syne',sans-serif;font-weight:700;font-size:0.9rem;color:#fff;
+  box-shadow:0 0 14px rgba(123,79,255,0.45);
+}
+.who-name{font-weight:600;font-size:0.88rem}
+.who-role{font-size:0.75rem;color:var(--muted)}
+
+/* CTA BAND */
+.cta-band{padding:0 24px 130px}
+.cta-box{
+  max-width:1100px;margin:0 auto;
+  background:var(--card);
+  border:1px solid rgba(123,79,255,0.3);
+  border-radius:26px;padding:90px 60px;
+  text-align:center;position:relative;overflow:hidden;
+}
+.cta-box::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(123,79,255,0.6),rgba(240,96,158,0.6),transparent);
+}
+.cta-box::after{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 50% 0%,rgba(123,79,255,0.14),transparent 65%);
+  pointer-events:none;
+}
+.cta-box h2{
+  font-family:'Syne',sans-serif;font-size:clamp(2.2rem,4vw,3.2rem);
+  font-weight:800;letter-spacing:-0.035em;margin-bottom:18px;
+  position:relative;z-index:1;
+}
+.cta-box p{font-size:1rem;color:var(--muted);margin-bottom:40px;position:relative;z-index:1}
+.cta-box .btn{position:relative;z-index:1}
+
+/* FOOTER */
+.footer{
+  border-top:1px solid var(--card-border);
+  padding:40px 56px;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:16px;
+}
+.footer-copy{font-size:0.8rem;color:var(--muted2)}
+.footer-links{display:flex;gap:24px}
+.footer-links a{font-size:0.8rem;color:var(--muted);text-decoration:none;transition:color 0.2s}
+.footer-links a:hover{color:var(--text)}
+
+/* REVEAL */
+.rv{
+  opacity:0;transform:translateY(36px);
+  transition:opacity 0.75s cubic-bezier(0.22,1,0.36,1),transform 0.75s cubic-bezier(0.22,1,0.36,1);
+}
+.rv.in{opacity:1;transform:none}
+.rv-d1{transition-delay:0.08s}
+.rv-d2{transition-delay:0.16s}
+.rv-d3{transition-delay:0.24s}
+
+@media(max-width:900px){
+  .nav{padding:16px 20px}
+  .nav-links{display:none}
+  .hero{padding:110px 20px 80px}
+  .steps-track{grid-template-columns:1fr 1fr}
+  .feat-grid{grid-template-columns:1fr 1fr}
+  .testi-grid{grid-template-columns:1fr}
+  .price-grid{grid-template-columns:1fr}
+  .win-sidebar{display:none}
+  .win-body{grid-template-columns:1fr}
+  .cta-box{padding:60px 28px}
+  .footer{flex-direction:column;text-align:center;padding:32px 20px}
+}
+@media(max-width:600px){
+  .steps-track{grid-template-columns:1fr}
+  .feat-grid{grid-template-columns:1fr}
+  .hero-title{font-size:2.8rem}
+}
+</style>
 </head>
 <body>
 
-<!-- ── NAVBAR ── -->
-<nav class="navbar" id="navbar">
-  <div class="nav-logo">
-    <div class="logo-icon">Z</div>
+<div id="spbar"></div>
+<canvas id="bgCanvas"></canvas>
+
+<!-- NAV -->
+<nav class="nav" id="nav">
+  <a href="index.html" class="logo">
+    <div class="logo-z">Z</div>
     ZaPTUre<span>AI</span>
-  </div>
+  </a>
   <div class="nav-links">
     <a href="#how-it-works">How It Works</a>
     <a href="#features">Features</a>
     <a href="#pricing">Pricing</a>
   </div>
   <div class="nav-cta">
-    <a href="studio.html" class="btn btn-outline btn-sm">Login</a>
-    <a href="studio.html" class="btn btn-primary btn-sm" data-cta>Start Free ✨</a>
+    <a href="login.html" class="btn btn-ghost btn-sm">Login</a>
+    <a href="studio.html" class="btn btn-primary btn-sm">Get Started ✨</a>
   </div>
 </nav>
 
-<!-- ── HERO ── -->
+<!-- HERO -->
 <section class="hero">
-  <div class="hero-blob blob-1"></div>
-  <div class="hero-blob blob-2"></div>
-  <div class="hero-blob blob-3"></div>
+  <div class="hero-glow"></div>
 
-  <div class="hero-badge">
-    <span class="badge-dot"></span>
-    Powered by Generative AI — Try it Free Today
-  </div>
+
 
   <h1 class="hero-title">
-    Create <span class="gradient-text">Stunning Ads</span><br/>in Seconds with AI
+    <span class="line">Create <span class="gt">Stunning Ads</span></span>
+    <span class="line">in <span class="gt2">Seconds</span> with AI</span>
   </h1>
 
   <p class="hero-sub">
-    Just describe your product, upload an image (optional), and ZaPTUre generates a professional poster or 30-second video ad — no design skills needed.
+    Describe your product, upload an image, and ZaPTUre generates a professional poster or 30-second video ad — no design skills, no agency needed.
   </p>
 
   <div class="hero-actions">
-    <a href="studio.html" class="btn btn-primary btn-lg" id="heroCtaBtn">
-      ✨ Create Your Ad — It's Free
-    </a>
-    <a href="#how-it-works" class="btn btn-outline btn-lg">See How It Works</a>
+    <a href="studio.html" class="btn btn-primary btn-lg">✨ Create Your Ad</a>
+    <a href="#how-it-works" class="btn btn-outline btn-lg">See How It Works →</a>
   </div>
-  <p class="hero-note"><span>1 free generation</span> · No credit card required · Cancel anytime</p>
 
-  <!-- Preview Card -->
-  <div class="hero-preview">
-    <div class="preview-card">
-      <div class="preview-toolbar">
-        <div class="preview-dot red"></div>
-        <div class="preview-dot yellow"></div>
-        <div class="preview-dot green"></div>
-        <span class="preview-title">ZaPTUre Studio — AI Advertisement Generator</span>
+  <p class="hero-note"><strong>1 generation on us</strong> · No credit card · Cancel anytime</p>
+
+  <div class="preview-wrap">
+    <div class="preview-win">
+      <div class="win-bar">
+        <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+        <div class="win-url">⚡ zapture.ai/studio — AI Advertisement Generator</div>
       </div>
-      <div class="preview-screen">
-        <div class="preview-ad-mock">
-          <div class="mock-ad-badge">✨ AI Generated</div>
-          <div class="mock-ad-title">Launch Your Brand<br/>to the World</div>
-          <div class="mock-ad-sub">Professional ads created in under 60 seconds</div>
-          <div class="mock-ad-btn">Get Started →</div>
-          <div class="shimmer-bar w80" style="margin-top:12px"></div>
-          <div class="shimmer-bar w60"></div>
+      <div class="win-body">
+        <div class="win-sidebar">
+          <div class="sb-item active"><div class="sb-dot"></div>New Ad</div>
+          <div class="sb-item"><div class="sb-dot"></div>My Ads</div>
+          <div class="sb-item"><div class="sb-dot"></div>Brand Kit</div>
+          <div class="sb-item"><div class="sb-dot"></div>Analytics</div>
+          <div class="sb-item"><div class="sb-dot"></div>Settings</div>
+        </div>
+        <div class="win-main">
+          <div class="ad-preview">
+            <div class="ad-ai-badge">✨ AI Generated</div>
+            <div class="ad-eyebrow">Summer Campaign 2026</div>
+            <div class="ad-h">Launch Your Brand<br/>to the World</div>
+            <div class="ad-sub">Professional ads created in under 60 seconds</div>
+            <div class="ad-cta">Get Started →</div>
+          </div>
+          <div class="stats-row">
+            <div class="stat"><div class="stat-n">2.4s</div><div class="stat-l">Generation time</div></div>
+            <div class="stat"><div class="stat-n">4K</div><div class="stat-l">Export quality</div></div>
+            <div class="stat"><div class="stat-n">50+</div><div class="stat-l">Ad styles</div></div>
+            <div class="stat"><div class="stat-n">98%</div><div class="stat-l">Satisfaction</div></div>
+          </div>
+          <div class="typing-row">
+            <div class="typing-msg" id="typingMsg">Generating your next masterpiece…</div>
+            <div class="typing-dots"><div class="td"></div><div class="td"></div><div class="td"></div></div>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ── HOW IT WORKS ── -->
-<section class="section how-it-works" id="how-it-works">
-  <div class="section-tag">Simple Process</div>
-  <h2 class="section-title reveal">How It Works</h2>
-  <p class="section-sub reveal">From idea to polished advertisement in four easy steps.</p>
-
-  <div class="steps-grid">
-    <div class="step-card reveal">
-      <div class="step-num">1</div>
-      <div class="step-icon">🎯</div>
-      <h3>Choose Your Format</h3>
-      <p>Pick between a stunning poster or a punchy 30-second video advertisement.</p>
-    </div>
-    <div class="step-card reveal">
-      <div class="step-num">2</div>
-      <div class="step-icon">✍️</div>
-      <h3>Describe Your Ad</h3>
-      <p>Tell our AI what your product or brand is about. Upload images if you have them.</p>
-    </div>
-    <div class="step-card reveal">
-      <div class="step-num">3</div>
-      <div class="step-icon">🎨</div>
-      <h3>Customise Style</h3>
-      <p>Choose colours, tone, voice, music and animation style to match your brand.</p>
-    </div>
-    <div class="step-card reveal">
-      <div class="step-num">4</div>
-      <div class="step-icon">⬇️</div>
-      <h3>Download & Share</h3>
-      <p>Your ad is ready in seconds. Download it and start running your campaign.</p>
-    </div>
-  </div>
-</section>
-
-<!-- ── FEATURES ── -->
-<section class="section features" id="features">
-  <div class="section-tag">Why ZaPTUre</div>
-  <h2 class="section-title reveal">Everything You Need to Advertise</h2>
-  <p class="section-sub reveal">Professional results without the agency price tag.</p>
-
-  <div class="features-grid">
-    <div class="feature-card reveal">
-      <div class="feature-icon-wrap">🖼️</div>
-      <h3>AI Poster Generator</h3>
-      <p>Generate eye-catching print and digital ad posters. Multiple styles, aspect ratios, and colour palettes to match your brand identity.</p>
-    </div>
-    <div class="feature-card reveal">
-      <div class="feature-icon-wrap">🎬</div>
-      <h3>Video Ad Creator</h3>
-      <p>Create engaging 15 or 30-second video ads with AI-generated voiceover, background music and dynamic animations.</p>
-    </div>
-    <div class="feature-card reveal">
-      <div class="feature-icon-wrap">📸</div>
-      <h3>Image Upload Support</h3>
-      <p>Bring your own product photos and brand assets. Our AI seamlessly integrates them into the final ad design.</p>
-    </div>
-    <div class="feature-card reveal">
-      <div class="feature-icon-wrap">🎵</div>
-      <h3>Music & Voice Control</h3>
-      <p>Choose from cinematic, upbeat, ambient and corporate music tracks. Select male, female or neutral voice styles.</p>
-    </div>
-    <div class="feature-card reveal">
-      <div class="feature-icon-wrap">⚡</div>
-      <h3>Instant Results</h3>
-      <p>No waiting days for an agency. Your professional advertisement is ready within seconds of hitting Generate.</p>
-    </div>
-    <div class="feature-card reveal">
-      <div class="feature-icon-wrap">💾</div>
-      <h3>One-Click Download</h3>
-      <p>Download your poster as a high-resolution PNG or share your video ad directly. Always yours to keep.</p>
-    </div>
-  </div>
-</section>
-
-<!-- ── PRICING ── -->
-<section class="section pricing" id="pricing">
-  <div class="section-tag">Pricing</div>
-  <h2 class="section-title reveal">Simple, Transparent Pricing</h2>
-  <p class="section-sub reveal">Start for free, upgrade when you're ready to scale.</p>
-
-  <div class="pricing-grid">
-    <!-- Free -->
-    <div class="pricing-card reveal">
-      <div class="pricing-plan">Free Trial</div>
-      <div class="pricing-amount"><sup>$</sup>0</div>
-      <div class="pricing-period">No credit card required</div>
-      <hr class="pricing-divider"/>
-      <ul class="pricing-features">
-        <li>1 Poster or Video Ad</li>
-        <li>All format options</li>
-        <li>Image upload</li>
-        <li>PNG download</li>
-      </ul>
-      <a href="studio.html" class="btn btn-outline" style="width:100%;justify-content:center;">Start for Free</a>
-    </div>
-
-    <!-- Pro -->
-    <div class="pricing-card featured reveal">
-      <div class="pricing-badge">🔥 Most Popular</div>
-      <div class="pricing-plan">Pro Plan</div>
-      <div class="pricing-amount"><sup>$</sup>19</div>
-      <div class="pricing-period">per month · billed monthly</div>
-      <hr class="pricing-divider"/>
-      <ul class="pricing-features">
-        <li>Unlimited Posters & Videos</li>
-        <li>HD &amp; 4K exports</li>
-        <li>Priority AI generation</li>
-        <li>Brand kit storage</li>
-        <li>Custom voice upload</li>
-        <li>Commercial licence</li>
-        <li>Priority support</li>
-      </ul>
-      <a href="studio.html" class="btn" style="width:100%;justify-content:center;background:#fff;color:var(--accent);">Upgrade to Pro ✨</a>
-    </div>
-  </div>
-</section>
-
-<!-- ── TESTIMONIALS ── -->
-<section class="section testimonials">
-  <div class="section-tag">Loved By Creators</div>
-  <h2 class="section-title reveal">What Our Users Say</h2>
-  <p class="section-sub reveal">Join thousands of entrepreneurs and marketers saving time with ZaPTUre.</p>
-
-  <div class="testimonials-grid">
-    <div class="testimonial-card reveal">
-      <div class="stars">★★★★★</div>
-      <p class="testimonial-text">"I created a full ad campaign in under 10 minutes. The poster quality blew away my clients — they thought I hired a designer!"</p>
-      <div class="testimonial-author">
-        <div class="author-avatar">P</div>
-        <div>
-          <div class="author-name">Priya Sharma</div>
-          <div class="author-role">Freelance Marketer</div>
-        </div>
+<!-- HOW IT WORKS -->
+<section class="section" id="how-it-works">
+  <div class="container">
+    <div class="stag rv">Simple Process</div>
+    <h2 class="stitle rv">Four Steps to Your <span class="gt">Perfect Ad</span></h2>
+    <p class="ssub rv">From idea to polished advertisement in under a minute.</p>
+    <div class="steps-track rv">
+      <div class="step">
+        <div class="step-n">01</div>
+        <span class="step-ico">🎯</span>
+        <h3>Choose Your Format</h3>
+        <p>Pick between a stunning poster or a punchy 30-second video advertisement.</p>
       </div>
-    </div>
-    <div class="testimonial-card reveal">
-      <div class="stars">★★★★★</div>
-      <p class="testimonial-text">"The video ad feature is insane. Background music, voiceover, animations — all done automatically. Saved me ₹40,000 in agency fees."</p>
-      <div class="testimonial-author">
-        <div class="author-avatar">R</div>
-        <div>
-          <div class="author-name">Rahul Verma</div>
-          <div class="author-role">Startup Founder</div>
-        </div>
+      <div class="step">
+        <div class="step-n">02</div>
+        <span class="step-ico">✍️</span>
+        <h3>Describe Your Ad</h3>
+        <p>Tell our AI what your product is about. Upload images if you have them.</p>
       </div>
-    </div>
-    <div class="testimonial-card reveal">
-      <div class="stars">★★★★★</div>
-      <p class="testimonial-text">"Finally an AI tool that doesn't just produce generic ads. The colour palettes and styles feel premium and on-brand every time."</p>
-      <div class="testimonial-author">
-        <div class="author-avatar">S</div>
-        <div>
-          <div class="author-name">Sofia Chen</div>
-          <div class="author-role">E-commerce Owner</div>
-        </div>
+      <div class="step">
+        <div class="step-n">03</div>
+        <span class="step-ico">🎨</span>
+        <h3>Customise Style</h3>
+        <p>Choose colours, tone, voice, music and animation style to match your brand.</p>
+      </div>
+      <div class="step">
+        <div class="step-n">04</div>
+        <span class="step-ico">⚡</span>
+        <h3>Download & Share</h3>
+        <p>Your ad is ready in seconds. Download it and launch your campaign.</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ── CTA BANNER ── -->
-<div class="cta-banner reveal">
-  <h2>Ready to Create Your First Ad?</h2>
-  <p>Join thousands of creators. One free generation — no strings attached.</p>
-  <a href="studio.html" class="btn btn-white btn-lg">✨ Start Creating for Free</a>
+<!-- FEATURES -->
+<section class="section" id="features" style="padding-top:0">
+  <div class="container">
+    <div class="stag rv">Why ZaPTUre</div>
+    <h2 class="stitle rv">Everything You Need<br/>to <span class="gt">Advertise</span></h2>
+    <p class="ssub rv">Professional results without the agency price tag.</p>
+    <div class="feat-grid">
+      <div class="feat rv"><div class="feat-ico">🖼️</div><h3>AI Poster Generator</h3><p>Eye-catching print and digital ad posters. Multiple styles, aspect ratios, and colour palettes matched to your brand.</p></div>
+      <div class="feat rv rv-d1"><div class="feat-ico">🎬</div><h3>Video Ad Creator</h3><p>Engaging 15 or 30-second video ads with AI voiceover, background music and dynamic animations.</p></div>
+      <div class="feat rv rv-d2"><div class="feat-ico">📸</div><h3>Image Upload</h3><p>Bring your own product photos and brand assets. Our AI seamlessly integrates them into the final design.</p></div>
+      <div class="feat rv"><div class="feat-ico">🎵</div><h3>Music & Voice Control</h3><p>Cinematic, upbeat, ambient and corporate music tracks. Male, female or neutral voice styles.</p></div>
+      <div class="feat rv rv-d1"><div class="feat-ico">⚡</div><h3>Instant Results</h3><p>No waiting for an agency. Your professional advertisement is ready within seconds of hitting Generate.</p></div>
+      <div class="feat rv rv-d2"><div class="feat-ico">💾</div><h3>One-Click Download</h3><p>Download your poster as a high-resolution PNG or share your video ad directly. Always yours to keep.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="section" id="pricing" style="padding-top:0">
+  <div class="container" style="text-align:center">
+    <div class="stag rv">Pricing</div>
+    <h2 class="stitle-lg rv" style="margin:0 auto 18px"><span class="gt">Pricing</span></h2>
+    <div class="price-grid">
+      <div class="price-card rv">
+        <div class="price-plan">Free Trial</div>
+        <div class="price-num"><sup>$</sup>0</div>
+        <div class="price-per">No credit card required</div>
+        <hr class="price-div"/>
+        <ul class="price-feats">
+          <li><div class="price-check">✓</div>1 Poster or Video Ad</li>
+          <li><div class="price-check">✓</div>All format options</li>
+          <li><div class="price-check">✓</div>Image upload</li>
+          <li><div class="price-check">✓</div>PNG download</li>
+        </ul>
+        <a href="studio.html" class="btn btn-outline" style="width:100%;justify-content:center">Get Started</a>
+      </div>
+      <div class="price-card hot rv rv-d1">
+        <div class="price-pop">🔥 Most Popular</div>
+        <div class="price-plan">Pro Plan</div>
+        <div class="price-num"><sup>$</sup>19</div>
+        <div class="price-per">per month · billed monthly</div>
+        <hr class="price-div"/>
+        <ul class="price-feats">
+          <li><div class="price-check">✓</div>Unlimited Posters & Videos</li>
+          <li><div class="price-check">✓</div>HD & 4K exports</li>
+          <li><div class="price-check">✓</div>Priority AI generation</li>
+          <li><div class="price-check">✓</div>Brand kit storage</li>
+          <li><div class="price-check">✓</div>Custom voice upload</li>
+          <li><div class="price-check">✓</div>Commercial licence</li>
+          <li><div class="price-check">✓</div>Priority support</li>
+        </ul>
+        <a href="studio.html" class="btn btn-primary" style="width:100%;justify-content:center">Upgrade to Pro ✨</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<!-- CTA -->
+<div class="cta-band">
+  <div class="cta-box rv">
+    <h2>Ready to Create <span class="gt">Your First Ad?</span></h2>
+    <p>Join thousands of creators. Your first generation is on us.</p>
+    <a href="studio.html" class="btn btn-primary btn-lg">✨ Start Creating</a>
+  </div>
 </div>
 
-<!-- ── FOOTER ── -->
+<!-- FOOTER -->
 <footer class="footer">
-  <div class="nav-logo" style="font-size:1.2rem;">
-    <div class="logo-icon" style="width:30px;height:30px;font-size:0.9rem;">Z</div>
-    ZaPTUre AI
-  </div>
+  <a href="index.html" class="logo" style="font-size:1.1rem">
+    <div class="logo-z" style="width:30px;height:30px;font-size:0.85rem">Z</div>
+    ZaPTUre<span>AI</span>
+  </a>
   <div class="footer-copy">© 2026 ZaPTUre AI. All rights reserved.</div>
   <div class="footer-links">
     <a href="#">Privacy</a>
@@ -257,6 +774,90 @@
   </div>
 </footer>
 
-<script src="scripts/main.js"></script>
+<script>
+/* ── PARTICLE CANVAS ── */
+const canvas=document.getElementById('bgCanvas'),ctx=canvas.getContext('2d');
+let W,H,pts=[];
+function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight}
+resize();window.addEventListener('resize',resize);
+
+class Pt{
+  constructor(){this.reset()}
+  reset(){
+    this.x=Math.random()*W;this.y=Math.random()*H;
+    this.r=Math.random()*1.5+0.3;
+    this.vx=(Math.random()-0.5)*0.25;this.vy=(Math.random()-0.5)*0.25;
+    this.a=Math.random();this.fade=Math.random()>0.5?0.004:-0.004;
+    const c=[[123,79,255],[240,96,158],[34,211,238]];
+    this.col=c[Math.floor(Math.random()*c.length)];
+  }
+  tick(){
+    this.x+=this.vx;this.y+=this.vy;
+    this.a+=this.fade;
+    if(this.a<=0||this.a>=1)this.fade*=-1;
+    if(this.x<0||this.x>W||this.y<0||this.y>H)this.reset();
+  }
+  draw(){
+    ctx.beginPath();ctx.arc(this.x,this.y,this.r,0,Math.PI*2);
+    ctx.fillStyle=`rgba(${this.col},${this.a*0.8})`;ctx.fill();
+  }
+}
+
+for(let i=0;i<140;i++)pts.push(new Pt());
+
+function drawLines(){
+  for(let i=0;i<pts.length;i++){
+    for(let j=i+1;j<pts.length;j++){
+      const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y;
+      const d=Math.sqrt(dx*dx+dy*dy);
+      if(d<110){
+        const a=(1-d/110)*0.12;
+        ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);
+        ctx.strokeStyle=`rgba(123,79,255,${a})`;ctx.lineWidth=0.5;ctx.stroke();
+      }
+    }
+  }
+}
+
+function loop(){
+  ctx.clearRect(0,0,W,H);
+  pts.forEach(p=>{p.tick();p.draw()});
+  drawLines();
+  requestAnimationFrame(loop);
+}
+loop();
+
+/* ── SCROLL EFFECTS ── */
+const nav=document.getElementById('nav'),spbar=document.getElementById('spbar');
+window.addEventListener('scroll',()=>{
+  nav.classList.toggle('solid',window.scrollY>60);
+  const p=(window.scrollY/(document.documentElement.scrollHeight-window.innerHeight))*100;
+  spbar.style.width=p+'%';
+},{ passive:true });
+
+/* ── REVEAL ── */
+const io=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('in')});
+},{threshold:0.12,rootMargin:'0px 0px -40px 0px'});
+document.querySelectorAll('.rv').forEach(el=>io.observe(el));
+
+/* ── TYPING ROTATOR ── */
+const msgs=[
+  'Generating your summer campaign…',
+  'Crafting a luxury product poster…',
+  'Building a 30-second video ad…',
+  'Applying brand colours…',
+  'Adding voiceover to your ad…',
+  'Rendering HD export…',
+];
+let mi=0;
+setInterval(()=>{
+  mi=(mi+1)%msgs.length;
+  const el=document.getElementById('typingMsg');
+  el.style.opacity='0';
+  setTimeout(()=>{el.textContent=msgs[mi];el.style.opacity='1';},300);
+},2800);
+document.getElementById('typingMsg').style.transition='opacity 0.3s';
+</script>
 </body>
 </html>

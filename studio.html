@@ -1,299 +1,1524 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>ZaPTUre Studio — Create Your Ad</title>
-  <meta name="description" content="ZaPTUre AI Studio — Generate stunning poster and video advertisements with AI in four simple steps."/>
-  <link rel="stylesheet" href="styles/main.css"/>
-  <link rel="stylesheet" href="styles/studio.css"/>
-</head>
-<body class="studio-body">
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>ZaPTUre Studio — Create Your Ad</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#050508;--bg2:#0a0a12;--bg3:#0f0f1a;
+  --card:rgba(255,255,255,0.04);--cb:rgba(255,255,255,0.08);--cb2:rgba(255,255,255,0.13);
+  --text:#eeeaf8;--muted:rgba(238,234,248,0.5);--muted2:rgba(238,234,248,0.28);
+  --v1:#7b4fff;--v2:#a78bfa;--pk:#f0609e;--cy:#22d3ee;
+  --g1:linear-gradient(135deg,#7b4fff,#f0609e);
+  --danger:#f87171;--r:14px;
+}
+html{overflow-x:hidden}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+canvas#bgC{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0.4}
 
-<!-- ── STUDIO HEADER ── -->
-<header class="studio-header">
-  <a href="index.html" class="back-link">← Back to Home</a>
-  <div class="nav-logo">
-    <div class="logo-icon">Z</div>
-    ZaPTUre<span style="color:var(--text)">AI</span>
+/* HEADER */
+.hdr{
+  position:sticky;top:0;z-index:80;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 20px;
+  background:rgba(5,5,8,0.85);backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--cb);
+}
+.hdr-left{display:flex;align-items:center;gap:12px}
+.back{
+  display:flex;align-items:center;gap:7px;
+  color:var(--muted);text-decoration:none;font-size:0.85rem;
+  transition:color 0.2s;font-weight:500;
+}
+.back:hover{color:var(--text)}
+.back svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.logo{
+  display:flex;align-items:center;gap:10px;
+  font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;
+  color:var(--text);text-decoration:none;letter-spacing:-0.02em;
+}
+.logo-z{
+  width:34px;height:34px;border-radius:10px;background:var(--g1);
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.95rem;color:#fff;font-weight:800;
+  box-shadow:0 0 20px rgba(123,79,255,0.5);
+}
+.logo span{background:var(--g1);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.trial-badge{
+  font-size:0.78rem;font-weight:600;color:var(--v2);
+  background:rgba(123,79,255,0.12);border:1px solid rgba(123,79,255,0.25);
+  border-radius:100px;padding:5px 13px;
+}
+.trial-badge.used{color:var(--danger);background:rgba(248,113,113,0.1);border-color:rgba(248,113,113,0.25)}
+
+/* PROGRESS BAR */
+.prog-wrap{
+  position:sticky;top:65px;z-index:70;
+  background:rgba(5,5,8,0.85);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--cb);
+  padding:18px 0;
+}
+.prog-inner{
+  max-width:700px;margin:0 auto;padding:0 24px;
+  display:flex;align-items:center;justify-content:center;gap:0;
+}
+.ps{display:flex;align-items:center;gap:0}
+.pc{
+  width:36px;height:36px;border-radius:50%;
+  border:2px solid var(--cb2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.82rem;font-weight:700;color:var(--muted);
+  background:var(--bg2);transition:all 0.4s cubic-bezier(0.22,1,0.36,1);
+  position:relative;z-index:1;flex-shrink:0;
+}
+.pc.active{border-color:var(--v1);color:#fff;background:var(--g1);box-shadow:0 0 18px rgba(123,79,255,0.5)}
+.pc.done{border-color:rgba(123,79,255,0.4);color:var(--v2);background:rgba(123,79,255,0.12)}
+.pl{font-size:0.72rem;color:var(--muted);margin-top:5px;white-space:nowrap;text-align:center;transition:color 0.3s}
+.pl.active{color:var(--v2)}
+.pstep{display:flex;flex-direction:column;align-items:center;gap:0}
+.conn{
+  width:60px;height:2px;background:var(--cb2);margin-bottom:20px;
+  position:relative;overflow:hidden;flex-shrink:0;
+}
+.conn-fill{
+  position:absolute;left:0;top:0;bottom:0;width:0%;
+  background:var(--g1);transition:width 0.5s cubic-bezier(0.22,1,0.36,1);
+}
+
+/* APP LAYOUT */
+.app-wrap{
+  display:flex;min-height:calc(100vh - 65px);
+  position:relative;z-index:1;
+}
+
+/* SIDEBAR */
+.sidebar{
+  width:240px;flex-shrink:0;
+  background:rgba(5,5,8,0.75);backdrop-filter:blur(20px);
+  border-right:1px solid var(--cb);
+  display:flex;flex-direction:column;
+  padding:24px 0;
+  position:sticky;top:65px;height:calc(100vh - 65px);
+  overflow-y:auto;
+  transition:transform 0.35s cubic-bezier(0.22,1,0.36,1);
+}
+.sb-section{
+  padding:0 14px;margin-bottom:6px;
+}
+.sb-label{
+  font-size:0.65rem;font-weight:700;letter-spacing:0.12em;
+  text-transform:uppercase;color:var(--muted2);
+  padding:0 12px;margin-bottom:8px;margin-top:18px;
+  display:block;
+}
+.sb-label:first-child{margin-top:0}
+.sb-nav{
+  display:flex;align-items:center;gap:11px;
+  padding:11px 12px;border-radius:11px;
+  font-size:0.85rem;color:var(--muted);cursor:pointer;
+  transition:background 0.2s,color 0.2s;
+  user-select:none;position:relative;
+  text-decoration:none;
+}
+.sb-nav:hover{background:rgba(255,255,255,0.05);color:var(--text)}
+.sb-nav.active{
+  background:rgba(123,79,255,0.14);
+  color:var(--v2);font-weight:600;
+}
+.sb-nav.active::before{
+  content:'';position:absolute;left:0;top:20%;bottom:20%;
+  width:3px;border-radius:0 3px 3px 0;
+  background:var(--g1);
+}
+.sb-ico{font-size:1.05rem;width:22px;text-align:center;flex-shrink:0}
+.sb-badge{
+  margin-left:auto;font-size:0.68rem;font-weight:700;
+  background:rgba(123,79,255,0.18);color:var(--v2);
+  border-radius:100px;padding:2px 8px;
+}
+.sb-divider{height:1px;background:var(--cb);margin:12px 14px}
+
+/* SIDEBAR USER CARD */
+.sb-user{
+  margin-top:auto;padding:14px;
+}
+.sb-user-card{
+  display:flex;align-items:center;gap:11px;
+  padding:12px 13px;border-radius:12px;
+  background:rgba(255,255,255,0.04);
+  border:1px solid var(--cb);
+  cursor:pointer;transition:background 0.2s;
+}
+.sb-user-card:hover{background:rgba(255,255,255,0.07)}
+.sb-ava{
+  width:34px;height:34px;border-radius:50%;
+  background:var(--g1);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Syne',sans-serif;font-weight:700;font-size:0.88rem;color:#fff;
+  box-shadow:0 0 12px rgba(123,79,255,0.4);
+}
+.sb-user-info{flex:1;min-width:0}
+.sb-user-name{font-size:0.82rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-user-email{font-size:0.7rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* CONTENT AREA */
+.content-area{flex:1;min-width:0;overflow-x:hidden}
+
+/* MAIN */
+.studio-main{
+  max-width:760px;margin:0 auto;
+  padding:48px 24px 100px;
+  position:relative;z-index:1;
+}
+
+/* ── INVENTORY PANEL ── */
+.inv-panel{display:none;padding:40px 32px 80px}
+.inv-panel.show{display:block;animation:panelIn 0.4s cubic-bezier(0.22,1,0.36,1) both}
+.panel-hdr{margin-bottom:36px}
+.panel-hdr h2{
+  font-family:'Syne',sans-serif;font-size:1.75rem;font-weight:800;
+  letter-spacing:-0.03em;margin-bottom:8px;
+}
+.panel-hdr p{font-size:0.9rem;color:var(--muted);line-height:1.6}
+.gt{background:var(--g1);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+
+.inv-empty{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:80px 24px;text-align:center;
+}
+.inv-empty-ico{font-size:3.5rem;display:block;margin-bottom:18px;opacity:0.6}
+.inv-empty h3{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;margin-bottom:10px}
+.inv-empty p{font-size:0.88rem;color:var(--muted);max-width:300px;line-height:1.65;margin-bottom:24px}
+
+.inv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:18px}
+.inv-card{
+  background:var(--card);border:1px solid var(--cb);
+  border-radius:16px;overflow:hidden;
+  transition:border-color 0.3s,transform 0.3s;
+  cursor:pointer;
+}
+.inv-card:hover{border-color:rgba(123,79,255,0.4);transform:translateY(-3px)}
+.inv-thumb{
+  width:100%;aspect-ratio:1;object-fit:cover;
+  display:flex;align-items:center;justify-content:center;
+  font-size:2rem;
+}
+.inv-thumb canvas{width:100%!important;height:auto!important}
+.inv-card-body{padding:14px}
+.inv-card-name{font-size:0.84rem;font-weight:600;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.inv-card-meta{font-size:0.72rem;color:var(--muted2)}
+.inv-card-actions{display:flex;gap:8px;padding:0 14px 14px}
+.inv-btn{
+  flex:1;padding:7px 0;border-radius:100px;
+  font-size:0.75rem;font-weight:600;text-align:center;
+  cursor:pointer;border:none;font-family:'Inter',sans-serif;
+  transition:all 0.2s;
+}
+.inv-btn.dl{background:rgba(123,79,255,0.15);color:var(--v2);border:1px solid rgba(123,79,255,0.25)}
+.inv-btn.dl:hover{background:rgba(123,79,255,0.25)}
+.inv-btn.del{background:rgba(248,113,113,0.08);color:var(--danger);border:1px solid rgba(248,113,113,0.2)}
+.inv-btn.del:hover{background:rgba(248,113,113,0.16)}
+
+/* ── PROFILE SETTINGS PANEL ── */
+.prof-panel{display:none;padding:40px 32px 80px}
+.prof-panel.show{display:block;animation:panelIn 0.4s cubic-bezier(0.22,1,0.36,1) both}
+.prof-section{margin-bottom:40px}
+.prof-section-title{
+  font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;
+  margin-bottom:20px;padding-bottom:12px;
+  border-bottom:1px solid var(--cb);
+  display:flex;align-items:center;gap:10px;
+}
+.prof-section-title span{font-size:1.1rem}
+
+.ava-wrap{
+  display:flex;align-items:center;gap:20px;margin-bottom:28px;
+}
+.prof-ava{
+  width:72px;height:72px;border-radius:50%;
+  background:var(--g1);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Syne',sans-serif;font-weight:800;font-size:1.6rem;color:#fff;
+  box-shadow:0 0 24px rgba(123,79,255,0.45);
+}
+.ava-info h3{font-family:'Syne',sans-serif;font-weight:700;font-size:1.05rem;margin-bottom:4px}
+.ava-info p{font-size:0.82rem;color:var(--muted)}
+.ava-info button{
+  margin-top:10px;background:rgba(123,79,255,0.12);
+  border:1px solid rgba(123,79,255,0.25);border-radius:100px;
+  padding:6px 16px;font-size:0.78rem;font-weight:600;
+  color:var(--v2);cursor:pointer;font-family:'Inter',sans-serif;
+  transition:background 0.2s;
+}
+.ava-info button:hover{background:rgba(123,79,255,0.22)}
+
+.prof-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.prof-save{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:12px 28px;border-radius:100px;
+  background:var(--g1);color:#fff;font-size:0.88rem;font-weight:700;
+  border:none;cursor:pointer;font-family:'Inter',sans-serif;
+  box-shadow:0 0 24px rgba(123,79,255,0.4);
+  transition:all 0.25s cubic-bezier(0.22,1,0.36,1);
+  margin-top:8px;
+}
+.prof-save:hover{transform:translateY(-2px);box-shadow:0 0 36px rgba(123,79,255,0.6)}
+
+.toggle-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 0;border-bottom:1px solid rgba(255,255,255,0.04);
+}
+.toggle-row:last-child{border:none}
+.toggle-info h4{font-size:0.88rem;font-weight:600;margin-bottom:3px}
+.toggle-info p{font-size:0.78rem;color:var(--muted);line-height:1.5}
+.toggle-sw{
+  width:44px;height:24px;border-radius:100px;
+  background:rgba(255,255,255,0.08);border:none;cursor:pointer;
+  position:relative;flex-shrink:0;transition:background 0.3s;
+}
+.toggle-sw.on{background:var(--g1);box-shadow:0 0 12px rgba(123,79,255,0.4)}
+.toggle-sw::after{
+  content:'';position:absolute;top:3px;left:3px;
+  width:18px;height:18px;border-radius:50%;
+  background:#fff;transition:left 0.28s cubic-bezier(0.22,1,0.36,1);
+  box-shadow:0 1px 4px rgba(0,0,0,0.3);
+}
+.toggle-sw.on::after{left:23px}
+
+.danger-zone{
+  background:rgba(248,113,113,0.05);
+  border:1px solid rgba(248,113,113,0.15);
+  border-radius:16px;padding:24px;
+}
+.danger-zone h4{font-size:0.9rem;font-weight:700;color:var(--danger);margin-bottom:8px}
+.danger-zone p{font-size:0.82rem;color:var(--muted);margin-bottom:18px;line-height:1.6}
+.danger-btn{
+  padding:9px 20px;border-radius:100px;
+  background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.3);
+  color:var(--danger);font-size:0.82rem;font-weight:600;
+  cursor:pointer;font-family:'Inter',sans-serif;transition:background 0.2s;
+}
+.danger-btn:hover{background:rgba(248,113,113,0.2)}
+
+/* MOBILE SIDEBAR TOGGLE */
+.sb-toggle{
+  display:none;padding:10px;cursor:pointer;
+  background:rgba(255,255,255,0.05);border:1px solid var(--cb);
+  border-radius:9px;font-size:1.1rem;
+}
+
+@media(max-width:768px){
+  .sidebar{
+    position:fixed;left:0;top:65px;bottom:0;z-index:60;
+    transform:translateX(-100%);
+    width:220px;
+  }
+  .sidebar.open{transform:translateX(0)}
+  .sb-toggle{display:flex;align-items:center;justify-content:center}
+  .inv-panel,.prof-panel{padding:24px 16px 60px}
+  .prof-row{grid-template-columns:1fr}
+}
+
+
+/* STEP PANELS */
+.panel{display:none}
+.panel.active{display:block;animation:panelIn 0.45s cubic-bezier(0.22,1,0.36,1) both}
+@keyframes panelIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+
+.step-head{margin-bottom:40px}
+.step-head h2{
+  font-family:'Syne',sans-serif;font-size:1.9rem;font-weight:800;
+  letter-spacing:-0.03em;margin-bottom:8px;
+}
+.step-head p{font-size:0.93rem;color:var(--muted);line-height:1.6}
+
+/* FORMAT CARDS */
+.fmt-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:40px}
+.fmt{
+  background:var(--card);border:2px solid var(--cb);border-radius:18px;
+  padding:32px 24px;cursor:pointer;position:relative;overflow:hidden;
+  transition:border-color 0.3s,background 0.3s,transform 0.3s;
+  text-align:center;
+}
+.fmt::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at 50% 0%,rgba(123,79,255,0.1),transparent 60%);
+  opacity:0;transition:opacity 0.35s;
+}
+.fmt:hover{border-color:rgba(123,79,255,0.35);transform:translateY(-3px)}
+.fmt:hover::before{opacity:1}
+.fmt.sel{
+  border-color:var(--v1);
+  background:rgba(123,79,255,0.08);
+  box-shadow:0 0 0 1px rgba(123,79,255,0.25),0 0 32px rgba(123,79,255,0.15);
+}
+.fmt.sel::before{opacity:1}
+.fmt-check{
+  position:absolute;top:14px;right:14px;
+  width:22px;height:22px;border-radius:50%;
+  background:var(--g1);display:none;
+  align-items:center;justify-content:center;
+  font-size:0.7rem;color:#fff;font-weight:700;
+  box-shadow:0 0 12px rgba(123,79,255,0.5);
+}
+.fmt.sel .fmt-check{display:flex}
+.fmt-ico{font-size:2.4rem;display:block;margin-bottom:16px}
+.fmt h3{font-family:'Syne',sans-serif;font-weight:700;font-size:1.05rem;margin-bottom:8px}
+.fmt p{font-size:0.82rem;color:var(--muted);line-height:1.55}
+.fmt-badge{
+  display:inline-block;margin-top:14px;
+  font-size:0.68rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;
+  color:var(--v2);background:rgba(123,79,255,0.12);
+  border-radius:100px;padding:3px 10px;
+}
+
+/* FORM */
+.form-grp{margin-bottom:26px}
+.form-label{
+  display:flex;align-items:center;justify-content:space-between;
+  font-size:0.82rem;font-weight:600;color:var(--text);
+  margin-bottom:9px;letter-spacing:0.01em;
+}
+.form-label .opt{font-weight:400;color:var(--muted);font-size:0.78rem}
+.char-c{font-size:0.75rem;color:var(--muted2);font-weight:400}
+.form-input,.form-ta{
+  width:100%;background:rgba(255,255,255,0.04);
+  border:1px solid var(--cb);border-radius:var(--r);
+  padding:13px 16px;font-size:0.9rem;color:var(--text);
+  font-family:'Inter',sans-serif;outline:none;
+  transition:border-color 0.25s,background 0.25s,box-shadow 0.25s;
+  -webkit-appearance:none;
+}
+.form-input:focus,.form-ta:focus{
+  border-color:rgba(123,79,255,0.55);
+  background:rgba(123,79,255,0.05);
+  box-shadow:0 0 0 3px rgba(123,79,255,0.12);
+}
+.form-input::placeholder,.form-ta::placeholder{color:var(--muted2)}
+.form-ta{resize:vertical;min-height:130px;line-height:1.6}
+.form-hint{font-size:0.75rem;color:var(--muted2);margin-top:7px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+
+/* UPLOAD */
+.upload-z{
+  border:2px dashed var(--cb);border-radius:var(--r);
+  padding:40px 24px;text-align:center;cursor:pointer;
+  position:relative;transition:border-color 0.3s,background 0.3s;
+  background:rgba(255,255,255,0.02);
+}
+.upload-z:hover{border-color:rgba(123,79,255,0.4);background:rgba(123,79,255,0.04)}
+.upload-z input[type=file]{
+  position:absolute;inset:0;opacity:0;cursor:pointer;
+}
+.upload-ico{font-size:2rem;display:block;margin-bottom:12px}
+.upload-z h4{font-size:0.95rem;font-weight:600;margin-bottom:6px}
+.upload-z p{font-size:0.8rem;color:var(--muted)}
+.upload-btn{
+  display:inline-block;margin-top:12px;
+  background:rgba(123,79,255,0.15);border:1px solid rgba(123,79,255,0.3);
+  border-radius:100px;padding:7px 18px;
+  font-size:0.8rem;font-weight:600;color:var(--v2);cursor:pointer;
+  transition:background 0.2s;
+}
+.upload-btn:hover{background:rgba(123,79,255,0.25)}
+.img-previews{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+.img-thumb{
+  width:80px;height:80px;border-radius:10px;
+  object-fit:cover;border:1px solid var(--cb);
+  position:relative;
+}
+
+/* STYLE OPTIONS */
+.style-section{margin-bottom:28px}
+.style-section h4{font-size:0.85rem;font-weight:600;margin-bottom:14px;color:var(--text)}
+.chips{display:flex;flex-wrap:wrap;gap:9px}
+.chip{
+  padding:8px 16px;border-radius:100px;
+  background:rgba(255,255,255,0.04);border:1px solid var(--cb);
+  font-size:0.82rem;color:var(--muted);cursor:pointer;
+  transition:all 0.22s;font-family:'Inter',sans-serif;
+}
+.chip:hover{border-color:rgba(123,79,255,0.35);color:var(--text);background:rgba(123,79,255,0.07)}
+.chip.sel{
+  background:rgba(123,79,255,0.14);border-color:rgba(123,79,255,0.45);
+  color:#c4b5fd;font-weight:600;
+  box-shadow:0 0 0 2px rgba(123,79,255,0.2);
+}
+
+/* VIDEO OPTIONS */
+.vid-opts{display:none;margin-top:8px}
+.vid-opts.show{display:block;animation:panelIn 0.3s ease both}
+
+/* SUMMARY */
+.summary{
+  background:rgba(255,255,255,0.03);
+  border:1px solid var(--cb);border-radius:18px;
+  padding:28px;margin-bottom:32px;
+}
+.summary h3{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;margin-bottom:20px;color:var(--v2)}
+.sum-row{display:flex;justify-content:space-between;align-items:flex-start;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05)}
+.sum-row:last-child{border:none}
+.sum-k{font-size:0.82rem;color:var(--muted);flex-shrink:0;margin-right:16px}
+.sum-v{font-size:0.85rem;font-weight:500;text-align:right;word-break:break-word}
+
+.gen-wrap{text-align:center;padding:16px 0 8px}
+.gen-note{font-size:0.78rem;color:var(--muted2);margin-top:10px}
+
+/* STEP NAV */
+.step-nav{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-top:40px;padding-top:24px;
+  border-top:1px solid var(--cb);
+}
+
+/* BUTTONS */
+.btn{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:11px 26px;border-radius:100px;
+  font-size:0.88rem;font-weight:600;
+  text-decoration:none;cursor:pointer;border:none;
+  transition:all 0.25s cubic-bezier(0.22,1,0.36,1);
+  font-family:'Inter',sans-serif;white-space:nowrap;
+}
+.btn-outline{
+  color:var(--text);background:rgba(255,255,255,0.05);
+  border:1px solid var(--cb2);
+}
+.btn-outline:hover{background:rgba(255,255,255,0.09);transform:translateY(-1px)}
+.btn-primary{
+  background:var(--g1);color:#fff;
+  box-shadow:0 0 24px rgba(123,79,255,0.4);
+}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 0 40px rgba(123,79,255,0.65)}
+.btn-primary:disabled{opacity:0.55;cursor:not-allowed;transform:none}
+.btn-lg{padding:16px 44px;font-size:1rem}
+
+/* LOADING */
+.loading-ov{
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  padding:80px 24px;text-align:center;
+}
+.loading-ov.show{display:flex;animation:panelIn 0.4s ease both}
+.spinner{
+  width:56px;height:56px;border-radius:50%;
+  border:3px solid rgba(123,79,255,0.15);
+  border-top-color:var(--v1);
+  animation:spin 0.9s linear infinite;
+  margin-bottom:28px;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-title{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:700;margin-bottom:8px}
+.loading-sub{font-size:0.88rem;color:var(--muted);margin-bottom:32px}
+.prog-bar{
+  width:280px;height:4px;border-radius:2px;
+  background:rgba(255,255,255,0.08);overflow:hidden;
+}
+.prog-fill{
+  height:100%;background:var(--g1);width:0%;
+  transition:width 0.4s cubic-bezier(0.22,1,0.36,1);
+  border-radius:2px;
+}
+
+/* RESULT */
+.result-area{display:none}
+.result-area.show{display:block;animation:panelIn 0.5s ease both}
+.result-card{
+  background:rgba(255,255,255,0.03);border:1px solid var(--cb);
+  border-radius:20px;overflow:hidden;margin-top:28px;
+}
+.result-hdr{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 24px;border-bottom:1px solid var(--cb);
+}
+.result-hdr h3{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700}
+.result-type{
+  font-size:0.72rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;
+  color:var(--v2);background:rgba(123,79,255,0.12);
+  border-radius:100px;padding:4px 12px;
+}
+.result-canvas-wrap{
+  padding:24px;display:flex;justify-content:center;
+  background:repeating-conic-gradient(rgba(255,255,255,0.03) 0%,rgba(255,255,255,0.03) 25%,transparent 0%,transparent 50%) 0 0/24px 24px;
+}
+.result-canvas-wrap canvas{border-radius:12px;max-width:100%;box-shadow:0 12px 48px rgba(0,0,0,0.5)}
+.result-actions{
+  display:flex;gap:12px;padding:20px 24px;
+  border-top:1px solid var(--cb);
+  flex-wrap:wrap;
+}
+
+/* PAYWALL MODAL */
+.modal-ov{
+  position:fixed;inset:0;z-index:200;
+  background:rgba(0,0,0,0.75);backdrop-filter:blur(12px);
+  display:none;align-items:center;justify-content:center;padding:24px;
+}
+.modal-ov.open{display:flex;animation:fadeIn 0.3s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.paywall{
+  background:var(--bg3);border:1px solid rgba(123,79,255,0.3);
+  border-radius:24px;padding:44px 40px;max-width:480px;width:100%;
+  position:relative;text-align:center;
+  box-shadow:0 40px 100px rgba(0,0,0,0.7),0 0 60px rgba(123,79,255,0.15);
+  animation:slideUp 0.4s cubic-bezier(0.22,1,0.36,1);
+}
+@keyframes slideUp{from{opacity:0;transform:translateY(32px)}to{opacity:1;transform:translateY(0)}}
+.paywall::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:var(--g1);border-radius:24px 24px 0 0;
+}
+.modal-close{
+  position:absolute;top:18px;right:18px;
+  width:30px;height:30px;border-radius:50%;
+  background:rgba(255,255,255,0.07);border:1px solid var(--cb);
+  color:var(--muted);font-size:0.8rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:background 0.2s,color 0.2s;
+}
+.modal-close:hover{background:rgba(255,255,255,0.12);color:var(--text)}
+.pw-ico{font-size:3rem;display:block;margin-bottom:20px}
+.paywall h2{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;letter-spacing:-0.03em;margin-bottom:12px}
+.paywall>p{font-size:0.9rem;color:var(--muted);margin-bottom:28px;line-height:1.65}
+.pw-plan{
+  background:rgba(123,79,255,0.07);border:1px solid rgba(123,79,255,0.2);
+  border-radius:16px;padding:24px 20px;margin-bottom:24px;text-align:left;
+}
+.pw-plan-name{font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--v2);margin-bottom:10px}
+.pw-price{font-family:'Syne',sans-serif;font-size:2.6rem;font-weight:800;letter-spacing:-0.04em;line-height:1;margin-bottom:18px}
+.pw-price sup{font-size:1.1rem;vertical-align:super}
+.pw-price span{font-size:1rem;font-weight:400;color:var(--muted)}
+.pw-feats{list-style:none;display:flex;flex-direction:column;gap:10px}
+.pw-feats li{display:flex;align-items:center;gap:9px;font-size:0.85rem;color:var(--muted)}
+.pw-feats li::before{content:'✓';color:var(--v2);font-weight:700;font-size:0.8rem}
+.checkout{display:none;margin-top:20px;text-align:left}
+.checkout.show{display:block;animation:panelIn 0.3s ease both}
+.co-input{
+  width:100%;background:rgba(255,255,255,0.05);
+  border:1px solid var(--cb);border-radius:var(--r);
+  padding:12px 14px;font-size:0.88rem;color:var(--text);
+  font-family:'Inter',sans-serif;outline:none;margin-bottom:12px;
+  transition:border-color 0.2s,box-shadow 0.2s;
+}
+.co-input:focus{border-color:rgba(123,79,255,0.5);box-shadow:0 0 0 3px rgba(123,79,255,0.1)}
+.co-input::placeholder{color:var(--muted2)}
+.co-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.co-secure{font-size:0.72rem;color:var(--muted2);text-align:center;margin-top:12px}
+.pw-note{font-size:0.73rem;color:var(--muted2);margin-top:14px;line-height:1.5}
+.pw-note a{color:var(--v2)}
+
+@media(max-width:600px){
+  .hdr{padding:14px 16px}
+  .studio-main{padding:32px 16px 80px}
+  .fmt-grid{grid-template-columns:1fr}
+  .form-row{grid-template-columns:1fr}
+  .paywall{padding:36px 24px}
+}
+</style>
+</head>
+<body>
+
+<canvas id="bgC"></canvas>
+
+<!-- HEADER -->
+<header class="hdr">
+  <div class="hdr-left">
+    <button class="sb-toggle" id="sbToggle" onclick="toggleSidebar()" aria-label="Toggle sidebar">☰</button>
+    <a href="index.html" class="back">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      Back
+    </a>
   </div>
-  <div style="width:100px;text-align:right;font-size:0.82rem;color:var(--text-muted);" id="trialBadge">
-    ✨ 1 free credit
-  </div>
+  <a href="index.html" class="logo">
+    <div class="logo-z">Z</div>
+    ZaPTUre<span>AI</span>
+  </a>
+  <div id="trialBadge" class="trial-badge">✨ 1 credit</div>
 </header>
 
-<!-- ── PROGRESS ── -->
-<div class="progress-container">
-  <div class="progress-steps">
-    <div class="progress-step">
-      <div class="step-circle active" id="sc1">1</div>
-      <div class="step-label">Format</div>
-    </div>
-    <div class="step-connector" id="conn1"></div>
-    <div class="progress-step">
-      <div class="step-circle" id="sc2">2</div>
-      <div class="step-label">Describe</div>
-    </div>
-    <div class="step-connector" id="conn2"></div>
-    <div class="progress-step">
-      <div class="step-circle" id="sc3">3</div>
-      <div class="step-label">Style</div>
-    </div>
-    <div class="step-connector" id="conn3"></div>
-    <div class="progress-step">
-      <div class="step-circle" id="sc4">4</div>
-      <div class="step-label">Generate</div>
+<!-- PROGRESS BAR -->
+<div class="prog-wrap" id="progWrap">
+  <div class="prog-inner">
+    <div class="ps">
+      <div class="pstep">
+        <div class="pc active" id="pc1">1</div>
+        <div class="pl active" id="pl1">Format</div>
+      </div>
+      <div class="conn"><div class="conn-fill" id="cf1"></div></div>
+      <div class="pstep">
+        <div class="pc" id="pc2">2</div>
+        <div class="pl" id="pl2">Describe</div>
+      </div>
+      <div class="conn"><div class="conn-fill" id="cf2"></div></div>
+      <div class="pstep">
+        <div class="pc" id="pc3">3</div>
+        <div class="pl" id="pl3">Style</div>
+      </div>
+      <div class="conn"><div class="conn-fill" id="cf3"></div></div>
+      <div class="pstep">
+        <div class="pc" id="pc4">4</div>
+        <div class="pl" id="pl4">Generate</div>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- ── STUDIO MAIN ── -->
+<!-- APP LAYOUT -->
+<div class="app-wrap">
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sb-section">
+    <span class="sb-label">Studio</span>
+    <div class="sb-nav active" id="sbnCreate" onclick="showView('create')">
+      <span class="sb-ico">✨</span> Create Ad
+    </div>
+    <div class="sb-nav" id="sbnInventory" onclick="showView('inventory')">
+      <span class="sb-ico">🗂️</span> Inventory
+      <span class="sb-badge" id="invCount">0</span>
+    </div>
+  </div>
+  <div class="sb-divider"></div>
+  <div class="sb-section">
+    <span class="sb-label">Account</span>
+    <div class="sb-nav" id="sbnProfile" onclick="showView('profile')">
+      <span class="sb-ico">👤</span> Profile Settings
+    </div>
+    <a href="index.html" class="sb-nav">
+      <span class="sb-ico">🏠</span> Home
+    </a>
+    <a href="login.html" class="sb-nav" onclick="logout()">
+      <span class="sb-ico">🚪</span> Sign Out
+    </a>
+  </div>
+  <div class="sb-user">
+    <div class="sb-user-card" onclick="showView('profile')">
+      <div class="sb-ava" id="sbAva">U</div>
+      <div class="sb-user-info">
+        <div class="sb-user-name" id="sbName">User</div>
+        <div class="sb-user-email" id="sbEmail">user@zapture.ai</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- CONTENT AREA -->
+<div class="content-area">
+<div id="viewCreate">
 <main class="studio-main">
 
-  <!-- ═══ STEP 1: FORMAT ═══ -->
-  <div class="step-panel active" id="step1">
-    <div class="step-heading">
+  <!-- STEP 1: FORMAT -->
+  <div class="panel active" id="s1">
+    <div class="step-head">
       <h2>What would you like to create?</h2>
-      <p>Choose the format that fits your campaign goals.</p>
+      <p>Choose the format that best fits your campaign goals.</p>
     </div>
-
-    <div class="format-grid">
-      <div class="format-card" data-format="poster" id="formatPoster">
-        <div class="format-check">✓</div>
-        <span class="format-emoji">🖼️</span>
+    <div class="fmt-grid">
+      <div class="fmt" id="fmtPoster" onclick="selectFormat('poster')">
+        <div class="fmt-check">✓</div>
+        <span class="fmt-ico">🖼️</span>
         <h3>Ad Poster</h3>
         <p>A high-resolution image ad for social media, print, or digital displays.</p>
-        <div class="format-badge">PNG Export</div>
+        <span class="fmt-badge">PNG Export</span>
       </div>
-      <div class="format-card" data-format="video" id="formatVideo">
-        <div class="format-check">✓</div>
-        <span class="format-emoji">🎬</span>
+      <div class="fmt" id="fmtVideo" onclick="selectFormat('video')">
+        <div class="fmt-check">✓</div>
+        <span class="fmt-ico">🎬</span>
         <h3>Video Ad</h3>
         <p>A 15 or 30-second animated video ad with voiceover and background music.</p>
-        <div class="format-badge">MP4 Preview</div>
+        <span class="fmt-badge">MP4 Preview</span>
       </div>
     </div>
-
     <div class="step-nav">
       <span></span>
       <button class="btn btn-primary" onclick="nextStep()">Next: Describe Your Ad →</button>
     </div>
   </div>
 
-  <!-- ═══ STEP 2: DESCRIBE ═══ -->
-  <div class="step-panel" id="step2">
-    <div class="step-heading">
+  <!-- STEP 2: DESCRIBE -->
+  <div class="panel" id="s2">
+    <div class="step-head">
       <h2>Describe your advertisement</h2>
-      <p>The more detail you give, the better your ad will be.</p>
+      <p>The more detail you give, the better your ad will look.</p>
     </div>
-
-    <div class="form-group">
-      <label class="form-label" for="promptInput">
-        Ad Prompt <span>* required</span>
-        <span class="char-counter" id="charCounter">0/500</span>
+    <div class="form-grp">
+      <label class="form-label">
+        Ad Prompt <span style="color:var(--danger);margin-left:3px">*</span>
+        <span class="char-c" id="charC">0 / 500</span>
       </label>
-      <textarea
-        class="form-textarea" id="promptInput"
-        placeholder="e.g. A vibrant summer sale poster for my clothing brand 'SunWear'. Bright colours, beach vibes, promoting 50% off on all summer dresses. Target audience: young women aged 18-30."
-        maxlength="500"></textarea>
+      <textarea class="form-ta" id="promptTa" maxlength="500"
+        placeholder="e.g. A vibrant summer sale poster for 'SunWear'. Bright colours, beach vibes, 50% off summer dresses. Target: women aged 18–30."
+        oninput="document.getElementById('charC').textContent=this.value.length+' / 500'"></textarea>
       <div class="form-hint">Describe your product, target audience, key message and mood.</div>
     </div>
-
-    <div class="form-group">
-      <label class="form-label" for="headlineInput">
-        Main Headline <span>(optional — auto-generated if blank)</span>
-      </label>
-      <input type="text" class="form-input" id="headlineInput" placeholder="e.g. Summer Sale — Up to 50% Off!"/>
+    <div class="form-grp">
+      <label class="form-label">Main Headline <span class="opt">optional — auto-generated if blank</span></label>
+      <input type="text" class="form-input" id="headlineIn" placeholder="e.g. Summer Sale — Up to 50% Off!"/>
     </div>
-
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-      <div class="form-group">
-        <label class="form-label" for="brandInput">Brand Name <span>(optional)</span></label>
-        <input type="text" class="form-input" id="brandInput" placeholder="e.g. SunWear"/>
+    <div class="form-row">
+      <div class="form-grp">
+        <label class="form-label">Brand Name <span class="opt">optional</span></label>
+        <input type="text" class="form-input" id="brandIn" placeholder="e.g. SunWear"/>
       </div>
-      <div class="form-group">
-        <label class="form-label" for="taglineInput">Tagline <span>(optional)</span></label>
-        <input type="text" class="form-input" id="taglineInput" placeholder="e.g. Wear the Sun"/>
+      <div class="form-grp">
+        <label class="form-label">Tagline <span class="opt">optional</span></label>
+        <input type="text" class="form-input" id="taglineIn" placeholder="e.g. Wear the Sun"/>
       </div>
     </div>
-
-    <div class="form-group">
-      <label class="form-label">Upload Images <span>(optional — up to 3)</span></label>
-      <div class="upload-zone" id="uploadZone">
-        <input type="file" id="fileInput" accept="image/*" multiple/>
-        <div class="upload-icon">📁</div>
-        <h4>Drag & drop your images here</h4>
+    <div class="form-grp">
+      <label class="form-label">Upload Images <span class="opt">optional · up to 3</span></label>
+      <div class="upload-z" id="uploadZ">
+        <input type="file" id="fileIn" accept="image/*" multiple/>
+        <span class="upload-ico">📁</span>
+        <h4>Drag & drop images here</h4>
         <p>or</p>
         <span class="upload-btn">Browse Files</span>
-        <p style="margin-top:10px;font-size:0.78rem;">PNG, JPG, WEBP · Max 3 images</p>
+        <p style="margin-top:10px;font-size:0.72rem;color:var(--muted2)">PNG, JPG, WEBP · Max 3 images</p>
       </div>
-      <div class="image-previews" id="imagePreviews"></div>
+      <div class="img-previews" id="imgPreviews"></div>
     </div>
-
     <div class="step-nav">
       <button class="btn btn-outline" onclick="prevStep()">← Back</button>
       <button class="btn btn-primary" onclick="nextStep()">Next: Style Options →</button>
     </div>
   </div>
 
-  <!-- ═══ STEP 3: STYLE ═══ -->
-  <div class="step-panel" id="step3">
-    <div class="step-heading">
+  <!-- STEP 3: STYLE -->
+  <div class="panel" id="s3">
+    <div class="step-head">
       <h2>Customise the style</h2>
-      <p>Make your ad match your brand's personality.</p>
+      <p>Make your ad match your brand's personality and tone.</p>
     </div>
-
-    <div id="step3Options">
-      <!-- Injected by renderStep3() -->
-    </div>
-
+    <div id="s3content"></div>
     <div class="step-nav">
       <button class="btn btn-outline" onclick="prevStep()">← Back</button>
       <button class="btn btn-primary" onclick="nextStep()">Next: Review & Generate →</button>
     </div>
   </div>
 
-  <!-- ═══ STEP 4: GENERATE ═══ -->
-  <div class="step-panel" id="step4">
-    <div id="step4Content">
-      <div class="step-heading">
-        <h2>Review &amp; Generate</h2>
-        <p>Everything looks good? Hit generate and let the AI do its magic.</p>
+  <!-- STEP 4: GENERATE -->
+  <div class="panel" id="s4">
+    <!-- Review state -->
+    <div id="reviewState">
+      <div class="step-head">
+        <h2>Review & Generate</h2>
+        <p>Everything looks good? Let the AI work its magic.</p>
       </div>
-
-      <div class="generate-summary">
+      <div class="summary">
         <h3>📋 Your Ad Summary</h3>
-        <div id="summaryContent"></div>
+        <div id="summaryRows"></div>
       </div>
-
-      <div class="generate-btn-wrap">
-        <button class="btn btn-primary btn-lg" id="generateBtn" style="font-size:1.1rem;padding:18px 48px;">
-          ✨ Generate My Ad
-        </button>
-        <p style="margin-top:12px;font-size:0.82rem;color:var(--text-muted);">
-          This will use your 1 free generation credit
-        </p>
+      <div class="gen-wrap">
+        <button class="btn btn-primary btn-lg" id="genBtn" onclick="startGenerate()">✨ Generate My Ad</button>
+        <p class="gen-note">This will use your 1 free generation credit</p>
       </div>
-
       <div class="step-nav">
         <button class="btn btn-outline" onclick="prevStep()">← Back</button>
         <span></span>
       </div>
     </div>
 
-    <!-- Loading overlay -->
-    <div class="loading-overlay" id="loadingOverlay">
-      <div class="loading-spinner"></div>
-      <div class="loading-text">Creating your ad…</div>
+    <!-- Loading -->
+    <div class="loading-ov" id="loadingOv">
+      <div class="spinner"></div>
+      <div class="loading-title">Creating your ad…</div>
       <div class="loading-sub" id="loadingMsg">Analysing your prompt…</div>
-      <div class="loading-bar-wrap">
-        <div class="loading-bar-fill" id="loadingBar"></div>
-      </div>
+      <div class="prog-bar"><div class="prog-fill" id="loadFill"></div></div>
     </div>
 
     <!-- Result -->
     <div class="result-area" id="resultArea">
-      <div class="step-heading">
+      <div class="step-head">
         <h2>🎉 Your Ad is Ready!</h2>
         <p>Download it or create another one.</p>
       </div>
-
       <div class="result-card">
-        <div class="result-header">
+        <div class="result-hdr">
           <h3>Generated Advertisement</h3>
-          <span class="result-type-badge" id="resultTypeBadge">Poster</span>
+          <span class="result-type" id="resultType">Poster</span>
         </div>
-        <div class="result-preview">
-          <div class="result-canvas-wrap">
-            <canvas id="resultCanvas"></canvas>
-          </div>
-          <div id="videoResultWrap" style="display:none;width:100%;max-width:540px;">
-            <div style="position:relative;border-radius:16px;overflow:hidden;box-shadow:0 12px 40px rgba(124,58,237,0.2);">
-              <canvas id="videoThumbCanvas" style="display:block;width:100%;height:auto;"></canvas>
-              <div class="play-button-overlay">
-                <div class="play-btn-circle">▶</div>
-              </div>
-            </div>
-            <p style="text-align:center;margin-top:16px;font-size:0.85rem;color:var(--text-muted);">
-              🎬 Video thumbnail preview — Full render available in Pro plan
-            </p>
-          </div>
+        <div class="result-canvas-wrap">
+          <canvas id="resultCanvas" width="540" height="540"></canvas>
         </div>
         <div class="result-actions">
-          <button class="btn btn-primary" id="downloadBtn">⬇️ Download</button>
-          <button class="btn btn-outline" id="createAnotherBtn">✨ Create Another</button>
+          <button class="btn btn-primary" id="dlBtn">⬇️ Download</button>
+          <button class="btn btn-outline" id="newBtn">✨ Create Another</button>
         </div>
       </div>
     </div>
   </div>
 
 </main>
+</div><!-- /viewCreate -->
+<div class="inv-panel" id="viewInventory">
+  <div class="panel-hdr">
+    <h2>Your <span class="gt">Inventory</span></h2>
+    <p>All the ads you've created are saved here.</p>
+  </div>
+  <div id="invContent"></div>
+</div>
 
-<!-- ═══ PAYWALL MODAL ═══ -->
-<div class="modal-overlay" id="paywallOverlay">
-  <div class="paywall-modal">
-    <button class="modal-close" id="closePaywall">✕</button>
-    <div class="paywall-emoji">🔒</div>
-    <h2>Free Trial Used Up</h2>
-    <p>You've used your 1 free generation. Upgrade to <strong>ZaPTUre Pro</strong> for unlimited posters and video ads.</p>
+<!-- PROFILE SETTINGS PANEL -->
+<div class="prof-panel" id="viewProfile">
+  <div class="panel-hdr">
+    <h2><span class="gt">Profile</span> Settings</h2>
+    <p>Manage your account information and preferences.</p>
+  </div>
 
-    <div class="paywall-plan">
-      <div class="paywall-plan-title">Pro Plan</div>
-      <div class="paywall-plan-price"><sup>$</sup>19<span>/month</span></div>
-      <ul class="paywall-features-list">
-        <li>Unlimited Posters &amp; Videos</li>
-        <li>HD &amp; 4K exports</li>
-        <li>Priority AI generation</li>
-        <li>Custom voice upload</li>
-        <li>Brand kit storage</li>
-        <li>Commercial licence</li>
-      </ul>
+  <!-- Avatar & Name -->
+  <div class="prof-section">
+    <div class="prof-section-title"><span>👤</span> Personal Information</div>
+    <div class="ava-wrap">
+      <div class="prof-ava" id="profAva">U</div>
+      <div class="ava-info">
+        <h3 id="profName">User</h3>
+        <p id="profEmail">user@zapture.ai</p>
+        <button onclick="this.textContent='Photo updated!'" style="cursor:pointer">📷 Change Photo</button>
+      </div>
     </div>
-
-    <button class="btn btn-primary" id="upgradeBtn" style="width:100%;justify-content:center;font-size:1rem;padding:16px;">
-      🚀 Upgrade to Pro — $19/mo
-    </button>
-
-    <!-- Mock Checkout Form -->
-    <div class="checkout-form" id="checkoutForm">
-      <div class="form-group" style="margin-bottom:14px;">
-        <label class="form-label" style="font-size:0.85rem;">Card Number</label>
-        <input type="text" class="form-input" placeholder="4242 4242 4242 4242" maxlength="19" id="cardNum"
-          oninput="this.value=this.value.replace(/\D/g,'').replace(/(.{4})/g,'$1 ').trim()"/>
+    <div class="prof-row">
+      <div class="form-grp">
+        <label class="form-label">First Name</label>
+        <input type="text" class="form-input" id="profFirstName" placeholder="Alex"/>
       </div>
-      <div class="checkout-row">
-        <div class="form-group" style="margin-bottom:14px;">
-          <label class="form-label" style="font-size:0.85rem;">Expiry</label>
-          <input type="text" class="form-input" placeholder="MM / YY" maxlength="7"/>
-        </div>
-        <div class="form-group" style="margin-bottom:14px;">
-          <label class="form-label" style="font-size:0.85rem;">CVC</label>
-          <input type="text" class="form-input" placeholder="•••" maxlength="3"/>
-        </div>
+      <div class="form-grp">
+        <label class="form-label">Last Name</label>
+        <input type="text" class="form-input" id="profLastName" placeholder="Johnson"/>
       </div>
-      <div class="form-group" style="margin-bottom:16px;">
-        <label class="form-label" style="font-size:0.85rem;">Name on Card</label>
-        <input type="text" class="form-input" placeholder="Your Full Name"/>
-      </div>
-      <button class="btn btn-primary" id="checkoutSubmit" style="width:100%;justify-content:center;padding:14px;">
-        Pay $19/month
-      </button>
-      <div class="checkout-secure">🔒 256-bit SSL encryption · Demo only</div>
     </div>
+    <div class="form-grp">
+      <label class="form-label">Email Address</label>
+      <input type="email" class="form-input" id="profEmailIn" placeholder="you@example.com"/>
+    </div>
+    <div class="form-grp">
+      <label class="form-label">Brand / Company <span style="font-weight:400;color:var(--muted)">optional</span></label>
+      <input type="text" class="form-input" id="profBrand" placeholder="e.g. SunWear Co."/>
+    </div>
+    <button class="prof-save" onclick="saveProfile(this)">✓ Save Changes</button>
+  </div>
 
-    <p class="paywall-note">By upgrading you agree to our <a href="#">Terms of Service</a>. Cancel anytime.</p>
+  <!-- Notifications -->
+  <div class="prof-section">
+    <div class="prof-section-title"><span>🔔</span> Notifications</div>
+    <div class="toggle-row">
+      <div class="toggle-info">
+        <h4>Generation Complete</h4>
+        <p>Notify me when my ad is ready</p>
+      </div>
+      <button class="toggle-sw on" onclick="this.classList.toggle('on')"></button>
+    </div>
+    <div class="toggle-row">
+      <div class="toggle-info">
+        <h4>Product Updates</h4>
+        <p>New features and improvements</p>
+      </div>
+      <button class="toggle-sw on" onclick="this.classList.toggle('on')"></button>
+    </div>
+    <div class="toggle-row">
+      <div class="toggle-info">
+        <h4>Marketing Emails</h4>
+        <p>Tips, tutorials and promotions</p>
+      </div>
+      <button class="toggle-sw" onclick="this.classList.toggle('on')"></button>
+    </div>
+  </div>
+
+  <!-- Security -->
+  <div class="prof-section">
+    <div class="prof-section-title"><span>🔐</span> Security</div>
+    <div class="form-grp">
+      <label class="form-label">Current Password</label>
+      <input type="password" class="form-input" placeholder="••••••••"/>
+    </div>
+    <div class="prof-row">
+      <div class="form-grp">
+        <label class="form-label">New Password</label>
+        <input type="password" class="form-input" placeholder="New password"/>
+      </div>
+      <div class="form-grp">
+        <label class="form-label">Confirm Password</label>
+        <input type="password" class="form-input" placeholder="Confirm"/>
+      </div>
+    </div>
+    <button class="prof-save" onclick="this.textContent='✓ Password Updated'">🔒 Update Password</button>
+  </div>
+
+  <!-- Danger Zone -->
+  <div class="prof-section">
+    <div class="prof-section-title"><span>⚠️</span> Danger Zone</div>
+    <div class="danger-zone">
+      <h4>Delete Account</h4>
+      <p>Permanently delete your account and all associated data. This action cannot be undone.</p>
+      <button class="danger-btn" onclick="if(confirm('Are you sure? This cannot be undone.'))alert('Account deletion requested.')">Delete My Account</button>
+    </div>
   </div>
 </div>
 
-<script src="scripts/trial.js"></script>
-<script src="scripts/generator.js"></script>
-<script src="scripts/studio.js"></script>
+</div><!-- /content-area -->
+</div><!-- /app-wrap -->
+
+<!-- PAYWALL -->
+<div class="modal-ov" id="paywall">
+  <div class="paywall">
+    <button class="modal-close" id="closePaywall">✕</button>
+    <span class="pw-ico">🔒</span>
+    <h2>Free Trial Used Up</h2>
+    <p>You've used your 1 free generation. Upgrade to <strong>ZaPTUre Pro</strong> for unlimited posters and video ads.</p>
+    <div class="pw-plan">
+      <div class="pw-plan-name">Pro Plan</div>
+      <div class="pw-price"><sup>$</sup>19<span>/month</span></div>
+      <ul class="pw-feats">
+        <li>Unlimited Posters & Videos</li>
+        <li>HD & 4K exports</li>
+        <li>Priority AI generation</li>
+        <li>Brand kit storage</li>
+        <li>Custom voice upload</li>
+        <li>Commercial licence</li>
+      </ul>
+    </div>
+    <button class="btn btn-primary" id="upgradeBtn" style="width:100%;justify-content:center;font-size:0.95rem;padding:14px">
+      🚀 Upgrade to Pro — $19/mo
+    </button>
+    <div class="checkout" id="checkout">
+      <div class="form-grp" style="margin-bottom:0">
+        <input class="co-input" type="text" placeholder="4242 4242 4242 4242" maxlength="19" id="cardNum"
+          oninput="this.value=this.value.replace(/\D/g,'').replace(/(.{4})/g,'$1 ').trim()"/>
+        <div class="co-row">
+          <input class="co-input" type="text" placeholder="MM / YY" maxlength="7"/>
+          <input class="co-input" type="text" placeholder="CVC" maxlength="3"/>
+        </div>
+        <input class="co-input" type="text" placeholder="Name on card"/>
+        <button class="btn btn-primary" id="payBtn" style="width:100%;justify-content:center;padding:13px">Pay $19/month</button>
+        <div class="co-secure">🔒 256-bit SSL · Demo only</div>
+      </div>
+    </div>
+    <p class="pw-note">By upgrading you agree to our <a href="#">Terms of Service</a>. Cancel anytime.</p>
+  </div>
+</div>
 
 <script>
-  // Update trial badge
-  if (Trial.isUsed()) {
-    document.getElementById('trialBadge').innerHTML = '<span style="color:var(--danger);font-weight:600;">⚠️ Trial used</span>';
+/* ── BG PARTICLES ── */
+const cv=document.getElementById('bgC'),cx=cv.getContext('2d');
+let W,H,dots=[];
+function rsz(){W=cv.width=window.innerWidth;H=cv.height=window.innerHeight}
+rsz();window.addEventListener('resize',rsz);
+class Dot{
+  constructor(){this.reset()}
+  reset(){
+    this.x=Math.random()*W;this.y=Math.random()*H;
+    this.r=Math.random()*1.2+0.3;
+    this.vx=(Math.random()-0.5)*0.2;this.vy=(Math.random()-0.5)*0.2;
+    this.a=Math.random();this.f=Math.random()>0.5?0.003:-0.003;
+    const c=[[123,79,255],[240,96,158]];
+    this.c=c[Math.floor(Math.random()*c.length)];
   }
+  tick(){
+    this.x+=this.vx;this.y+=this.vy;
+    this.a+=this.f;if(this.a<=0||this.a>=1)this.f*=-1;
+    if(this.x<0||this.x>W||this.y<0||this.y>H)this.reset();
+  }
+  draw(){cx.beginPath();cx.arc(this.x,this.y,this.r,0,Math.PI*2);cx.fillStyle=`rgba(${this.c},${this.a*0.7})`;cx.fill()}
+}
+for(let i=0;i<80;i++)dots.push(new Dot());
+(function lp(){cx.clearRect(0,0,W,H);dots.forEach(d=>{d.tick();d.draw()});requestAnimationFrame(lp)})();
+
+/* ── STATE ── */
+const state={step:1,format:'poster',prompt:'',headline:'',brand:'',tagline:'',
+  color:'Purple',style:'Vibrant',mood:'Energetic',music:'Upbeat',voice:'Female',duration:'30s'};
+const trialKey='zapture_trial_used';
+
+function trialUsed(){return localStorage.getItem(trialKey)==='1'}
+function markTrial(){localStorage.setItem(trialKey,'1')}
+
+if(trialUsed()){
+  document.getElementById('trialBadge').textContent='⚠️ Trial used';
+  document.getElementById('trialBadge').classList.add('used');
+}
+
+/* ── STEP LOGIC ── */
+function goTo(n){
+  document.getElementById('s'+state.step).classList.remove('active');
+  state.step=n;
+  document.getElementById('s'+n).classList.add('active');
+  updateProgress();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function nextStep(){
+  if(state.step===1&&!state.format){alert('Please choose a format.');return}
+  if(state.step===2){
+    const v=document.getElementById('promptTa').value.trim();
+    if(!v){alert('Please describe your ad.');return}
+    state.prompt=v;
+    state.headline=document.getElementById('headlineIn').value.trim();
+    state.brand=document.getElementById('brandIn').value.trim();
+    state.tagline=document.getElementById('taglineIn').value.trim();
+  }
+  if(state.step===3) buildSummary();
+  if(state.step<4)goTo(state.step+1);
+}
+function prevStep(){if(state.step>1)goTo(state.step-1)}
+
+function updateProgress(){
+  for(let i=1;i<=4;i++){
+    const c=document.getElementById('pc'+i),l=document.getElementById('pl'+i);
+    c.className='pc'+(i<state.step?' done':i===state.step?' active':'');
+    l.className='pl'+(i===state.step?' active':'');
+  }
+  for(let i=1;i<=3;i++){
+    document.getElementById('cf'+i).style.width=state.step>i?'100%':'0%';
+  }
+}
+
+/* ── FORMAT ── */
+function selectFormat(f){
+  state.format=f;
+  document.querySelectorAll('.fmt').forEach(el=>el.classList.remove('sel'));
+  document.getElementById('fmt'+(f==='poster'?'Poster':'Video')).classList.add('sel');
+  if(f==='video'){
+    document.getElementById('s3content').querySelector('.vid-opts')?.classList.add('show');
+  }
+}
+
+/* ── STYLE STEP ── */
+function buildStep3(){
+  const isPoster=state.format==='poster';
+  document.getElementById('s3content').innerHTML=`
+    <div class="style-section">
+      <h4>Colour Palette</h4>
+      <div class="chips" id="chips-color">
+        ${['Purple','Violet & Pink','Cyan & Blue','Warm Gold','Monochrome','Pastel','Neon','Earth Tones'].map(c=>`<div class="chip${c==='Purple'?' sel':''}" onclick="selChip('color','${c}',this)">${c}</div>`).join('')}
+      </div>
+    </div>
+    <div class="style-section">
+      <h4>Visual Style</h4>
+      <div class="chips" id="chips-style">
+        ${['Vibrant','Minimalist','Luxurious','Playful','Cinematic','Bold & Punchy','Elegant','Retro'].map(s=>`<div class="chip${s==='Vibrant'?' sel':''}" onclick="selChip('style','${s}',this)">${s}</div>`).join('')}
+      </div>
+    </div>
+    <div class="style-section">
+      <h4>Tone & Mood</h4>
+      <div class="chips" id="chips-mood">
+        ${['Energetic','Professional','Playful','Trustworthy','Inspirational','Urgent','Calm','Bold'].map(m=>`<div class="chip${m==='Energetic'?' sel':''}" onclick="selChip('mood','${m}',this)">${m}</div>`).join('')}
+      </div>
+    </div>
+    ${!isPoster?`
+    <div class="vid-opts show">
+      <div class="style-section">
+        <h4>Duration</h4>
+        <div class="chips">
+          <div class="chip sel" onclick="selChip('duration','15s',this)">15 seconds</div>
+          <div class="chip" onclick="selChip('duration','30s',this)">30 seconds</div>
+        </div>
+      </div>
+      <div class="style-section">
+        <h4>Background Music</h4>
+        <div class="chips">
+          ${['Upbeat','Cinematic','Corporate','Ambient','Dramatic','No Music'].map(m=>`<div class="chip${m==='Upbeat'?' sel':''}" onclick="selChip('music','${m}',this)">${m}</div>`).join('')}
+        </div>
+      </div>
+      <div class="style-section">
+        <h4>Voiceover Style</h4>
+        <div class="chips">
+          ${['Female','Male','Neutral'].map(v=>`<div class="chip${v==='Female'?' sel':''}" onclick="selChip('voice','${v}',this)">${v}</div>`).join('')}
+        </div>
+      </div>
+    </div>`:''}
+  `;
+}
+
+function selChip(key,val,el){
+  state[key]=val;
+  el.closest('.chips').querySelectorAll('.chip').forEach(c=>c.classList.remove('sel'));
+  el.classList.add('sel');
+}
+
+/* ── SUMMARY ── */
+function buildSummary(){
+  const rows=[
+    ['Format',state.format==='poster'?'🖼️ Ad Poster':'🎬 Video Ad'],
+    ['Prompt',state.prompt.length>80?state.prompt.slice(0,80)+'…':state.prompt],
+    state.headline?['Headline',state.headline]:null,
+    state.brand?['Brand',state.brand]:null,
+    state.tagline?['Tagline',state.tagline]:null,
+    ['Colour Palette',state.color],
+    ['Visual Style',state.style],
+    ['Tone & Mood',state.mood],
+    ...(state.format==='video'?[['Duration',state.duration],['Music',state.music],['Voice',state.voice]]:[]),
+  ].filter(Boolean);
+  document.getElementById('summaryRows').innerHTML=rows.map(([k,v])=>
+    `<div class="sum-row"><span class="sum-k">${k}</span><span class="sum-v">${v}</span></div>`
+  ).join('');
+}
+
+/* ── GENERATE ── */
+const loadMsgs=['Analysing your prompt…','Selecting visual style…','Compositing layers…','Adding brand elements…','Applying colour palette…','Rendering final output…','Almost done…'];
+let loadTimer;
+
+function startGenerate(){
+  if(trialUsed()){showPaywall();return}
+  document.getElementById('reviewState').style.display='none';
+  const ov=document.getElementById('loadingOv');
+  ov.classList.add('show');
+  let pct=0,mi=0;
+  const fill=document.getElementById('loadFill');
+  const msgEl=document.getElementById('loadingMsg');
+  loadTimer=setInterval(()=>{
+    pct=Math.min(pct+Math.random()*8+3,95);
+    fill.style.width=pct+'%';
+    if(mi<loadMsgs.length-1&&pct>mi*14){
+      mi++;msgEl.style.opacity='0';
+      setTimeout(()=>{msgEl.textContent=loadMsgs[mi];msgEl.style.opacity='1';},250);
+    }
+  },380);
+  msgEl.style.transition='opacity 0.25s';
+  setTimeout(()=>{
+    clearInterval(loadTimer);fill.style.width='100%';
+    setTimeout(()=>showResult(),500);
+  },5500);
+}
+
+function showResult(){
+  markTrial();
+  document.getElementById('trialBadge').textContent='⚠️ Trial used';
+  document.getElementById('trialBadge').classList.add('used');
+  document.getElementById('loadingOv').classList.remove('show');
+  const ra=document.getElementById('resultArea');
+  ra.classList.add('show');
+  document.getElementById('resultType').textContent=state.format==='poster'?'Poster':'Video Ad';
+  drawResult();
+  document.getElementById('dlBtn').onclick=downloadResult;
+  document.getElementById('newBtn').onclick=()=>{
+    if(trialUsed()){showPaywall();}
+    else{state.step=1;goTo(1);}
+  };
+}
+
+function drawResult(){
+  const canvas=document.getElementById('resultCanvas');
+  const ctx=canvas.getContext('2d');
+  const W=540,H=540;
+  canvas.width=W;canvas.height=H;
+
+  // Background gradient based on chosen palette
+  const gradMap={
+    'Purple':['#7b4fff','#f0609e'],
+    'Violet & Pink':['#8b5cf6','#ec4899'],
+    'Cyan & Blue':['#22d3ee','#3b82f6'],
+    'Warm Gold':['#f59e0b','#ef4444'],
+    'Monochrome':['#374151','#111827'],
+    'Pastel':['#c4b5fd','#fbcfe8'],
+    'Neon':['#a3e635','#22d3ee'],
+    'Earth Tones':['#b45309','#78350f'],
+  };
+  const [c1,c2]=gradMap[state.color]||['#7b4fff','#f0609e'];
+  const grad=ctx.createLinearGradient(0,0,W,H);
+  grad.addColorStop(0,c1);grad.addColorStop(1,c2);
+  ctx.fillStyle=grad;ctx.fillRect(0,0,W,H);
+
+  // Overlay layer
+  ctx.fillStyle='rgba(0,0,0,0.25)';ctx.fillRect(0,0,W,H);
+
+  // Geometric shapes
+  ctx.save();
+  ctx.globalAlpha=0.12;
+  ctx.strokeStyle='rgba(255,255,255,0.5)';
+  ctx.lineWidth=1;
+  for(let i=0;i<6;i++){
+    ctx.beginPath();
+    ctx.arc(W*0.78,H*0.22,60+i*30,0,Math.PI*2);
+    ctx.stroke();
+  }
+  ctx.restore();
+
+  // Noise/grain overlay
+  ctx.save();
+  ctx.globalAlpha=0.04;
+  for(let i=0;i<4000;i++){
+    ctx.fillStyle=Math.random()>0.5?'#fff':'#000';
+    ctx.fillRect(Math.random()*W,Math.random()*H,1,1);
+  }
+  ctx.restore();
+
+  // "AI Generated" badge
+  ctx.save();
+  ctx.fillStyle='rgba(255,255,255,0.15)';
+  roundRect(ctx,W-120,14,106,28,14);ctx.fill();
+  ctx.fillStyle='#fff';ctx.font='500 11px Inter,sans-serif';
+  ctx.textAlign='right';ctx.fillText('✨ AI Generated',W-20,33);
+  ctx.restore();
+
+  // Brand name
+  if(state.brand){
+    ctx.save();
+    ctx.fillStyle='rgba(255,255,255,0.65)';
+    ctx.font='600 13px Inter,sans-serif';ctx.textAlign='left';
+    ctx.fillText(state.brand.toUpperCase(),36,56);
+    ctx.restore();
+  }
+
+  // Eyebrow tag
+  ctx.save();
+  ctx.fillStyle='rgba(255,255,255,0.5)';
+  ctx.font='600 11px Inter,sans-serif';ctx.textAlign='left';
+  ctx.fillText((state.style+' · '+state.mood).toUpperCase(),36,state.brand?82:56);
+  ctx.restore();
+
+  // Main headline
+  const headline=state.headline||(state.brand?'Introducing '+state.brand:'Your Brand Starts Here');
+  ctx.save();
+  ctx.fillStyle='#fff';
+  ctx.font='800 '+Math.min(58,Math.max(36,840/headline.length))+'px Syne,sans-serif';
+  ctx.textAlign='left';
+  wrapText(ctx,headline,36,state.brand?148:120,W-72,72);
+  ctx.restore();
+
+  // Subtext
+  const sub=state.tagline||(state.prompt.slice(0,60)+'…');
+  ctx.save();
+  ctx.fillStyle='rgba(255,255,255,0.72)';
+  ctx.font='400 15px Inter,sans-serif';ctx.textAlign='left';
+  wrapText(ctx,sub,36,H-110,W-72,24);
+  ctx.restore();
+
+  // CTA button
+  ctx.save();
+  ctx.fillStyle='rgba(255,255,255,0.2)';
+  roundRect(ctx,36,H-66,160,42,21);ctx.fill();
+  ctx.strokeStyle='rgba(255,255,255,0.35)';ctx.lineWidth=1;
+  roundRect(ctx,36,H-66,160,42,21);ctx.stroke();
+  ctx.fillStyle='#fff';ctx.font='700 14px Inter,sans-serif';ctx.textAlign='center';
+  ctx.fillText('Get Started →',116,H-40);
+  ctx.restore();
+
+  // Format badge
+  if(state.format==='video'){
+    ctx.save();
+    ctx.fillStyle='rgba(0,0,0,0.35)';
+    roundRect(ctx,36,14,110,28,14);ctx.fill();
+    ctx.fillStyle='#fff';ctx.font='600 12px Inter,sans-serif';ctx.textAlign='left';
+    ctx.fillText('🎬 Video Ad  '+state.duration,50,33);
+    ctx.restore();
+  }
+}
+
+function roundRect(ctx,x,y,w,h,r){
+  ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);
+  ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);
+  ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);
+  ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);
+  ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();
+}
+function wrapText(ctx,txt,x,y,mw,lh){
+  const words=txt.split(' '),lines=[];let cur='';
+  for(const w of words){
+    const test=cur?cur+' '+w:w;
+    if(ctx.measureText(test).width>mw&&cur){lines.push(cur);cur=w;}
+    else cur=test;
+  }
+  if(cur)lines.push(cur);
+  lines.forEach((l,i)=>ctx.fillText(l,x,y+i*lh));
+}
+
+function downloadResult(){
+  const link=document.createElement('a');
+  link.download='zapture-ad-'+Date.now()+'.png';
+  link.href=document.getElementById('resultCanvas').toDataURL('image/png');
+  link.click();
+}
+
+/* ── PAYWALL ── */
+function showPaywall(){
+  document.getElementById('paywall').classList.add('open');
+}
+document.getElementById('closePaywall').onclick=()=>{
+  document.getElementById('paywall').classList.remove('open');
+};
+document.getElementById('paywall').addEventListener('click',e=>{
+  if(e.target===e.currentTarget)e.currentTarget.classList.remove('open');
+});
+document.getElementById('upgradeBtn').onclick=function(){
+  document.getElementById('checkout').classList.add('show');
+  this.style.display='none';
+};
+document.getElementById('payBtn').onclick=function(){
+  this.textContent='Processing…';this.disabled=true;
+  setTimeout(()=>{this.textContent='✓ Payment successful!';},2000);
+};
+
+/* ── FILE UPLOAD ── */
+document.getElementById('fileIn').addEventListener('change',function(){
+  const prev=document.getElementById('imgPreviews');prev.innerHTML='';
+  const files=[...this.files].slice(0,3);
+  files.forEach(f=>{
+    const r=new FileReader();
+    r.onload=e=>{
+      const img=document.createElement('img');
+      img.src=e.target.result;img.className='img-thumb';prev.appendChild(img);
+    };r.readAsDataURL(f);
+  });
+});
+
+/* ── INIT ── */
+function initUser(){
+  try{
+    const u=JSON.parse(localStorage.getItem('zapture_user')||'{}');
+    const name=u.name||'User';
+    const email=u.email||'user@zapture.ai';
+    const initial=name.charAt(0).toUpperCase();
+    // Sidebar user card
+    document.getElementById('sbAva').textContent=initial;
+    document.getElementById('sbName').textContent=name;
+    document.getElementById('sbEmail').textContent=email;
+    // Profile panel
+    document.getElementById('profAva').textContent=initial;
+    document.getElementById('profName').textContent=name;
+    document.getElementById('profEmail').textContent=email;
+    document.getElementById('profEmailIn').value=email;
+    const parts=name.split(' ');
+    document.getElementById('profFirstName').value=parts[0]||'';
+    document.getElementById('profLastName').value=parts.slice(1).join(' ')||'';
+  }catch(e){}
+}
+
+/* ── VIEW SWITCHER ── */
+function showView(v){
+  // Hide all content panels
+  document.getElementById('viewCreate').style.display='none';
+  document.getElementById('viewInventory').classList.remove('show');
+  document.getElementById('viewProfile').classList.remove('show');
+  document.getElementById('progWrap').style.display='none';
+
+  // Remove active from all nav items
+  ['sbnCreate','sbnInventory','sbnProfile'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el)el.classList.remove('active');
+  });
+
+  if(v==='create'){
+    document.getElementById('viewCreate').style.display='block';
+    document.getElementById('progWrap').style.display='block';
+    document.getElementById('sbnCreate').classList.add('active');
+  }else if(v==='inventory'){
+    document.getElementById('viewInventory').classList.add('show');
+    document.getElementById('sbnInventory').classList.add('active');
+    renderInventory();
+  }else if(v==='profile'){
+    document.getElementById('viewProfile').classList.add('show');
+    document.getElementById('sbnProfile').classList.add('active');
+  }
+
+  // Close mobile sidebar
+  document.getElementById('sidebar').classList.remove('open');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ── INVENTORY ── */
+const invKey='zapture_inventory';
+function getInventory(){try{return JSON.parse(localStorage.getItem(invKey)||'[]');}catch{return[];}}
+function saveToInventory(dataUrl,meta){
+  const inv=getInventory();
+  inv.unshift({id:Date.now(),dataUrl,meta,created:new Date().toLocaleDateString()});
+  localStorage.setItem(invKey,JSON.stringify(inv.slice(0,50)));
+  updateInvCount();
+}
+function updateInvCount(){
+  const c=getInventory().length;
+  document.getElementById('invCount').textContent=c;
+}
+function renderInventory(){
+  const inv=getInventory();
+  const el=document.getElementById('invContent');
+  if(!inv.length){
+    el.innerHTML=`<div class="inv-empty">
+      <span class="inv-empty-ico">🖼️</span>
+      <h3>No ads yet</h3>
+      <p>Your generated ads will appear here. Create your first one!</p>
+      <button class="btn btn-primary" onclick="showView('create')">✨ Create Your First Ad</button>
+    </div>`;
+    return;
+  }
+  el.innerHTML=`<div class="inv-grid">${inv.map((item,idx)=>`
+    <div class="inv-card">
+      <div class="inv-thumb"><img src="${item.dataUrl}" style="width:100%;height:100%;object-fit:cover" alt="Ad ${idx+1}"/></div>
+      <div class="inv-card-body">
+        <div class="inv-card-name">${item.meta?.format==='video'?'🎦':'🖼️'} ${item.meta?.brand||'Ad '+(idx+1)}</div>
+        <div class="inv-card-meta">${item.created} · ${item.meta?.style||'Custom'}</div>
+      </div>
+      <div class="inv-card-actions">
+        <button class="inv-btn dl" onclick="dlInv('${item.id}')">⬇ Download</button>
+        <button class="inv-btn del" onclick="delInv('${item.id}')">✕ Delete</button>
+      </div>
+    </div>`).join('')}</div>`;
+}
+function dlInv(id){
+  const item=getInventory().find(i=>i.id==id);
+  if(!item)return;
+  const a=document.createElement('a');
+  a.download='zapture-ad-'+id+'.png';
+  a.href=item.dataUrl;a.click();
+}
+function delInv(id){
+  if(!confirm('Delete this ad from your inventory?'))return;
+  const inv=getInventory().filter(i=>i.id!=id);
+  localStorage.setItem(invKey,JSON.stringify(inv));
+  updateInvCount();renderInventory();
+}
+
+/* ── PROFILE SAVE ── */
+function saveProfile(btn){
+  const first=document.getElementById('profFirstName').value.trim();
+  const last=document.getElementById('profLastName').value.trim();
+  const email=document.getElementById('profEmailIn').value.trim();
+  const name=([first,last].filter(Boolean).join(' '))||'User';
+  const u=JSON.parse(localStorage.getItem('zapture_user')||'{}');
+  Object.assign(u,{name,email});
+  localStorage.setItem('zapture_user',JSON.stringify(u));
+  initUser();
+  const orig=btn.textContent;
+  btn.textContent='✓ Saved!';
+  setTimeout(()=>btn.textContent=orig,2000);
+}
+
+/* ── LOGOUT ── */
+function logout(){
+  localStorage.removeItem('zapture_user');
+}
+
+/* ── SIDEBAR TOGGLE (mobile) ── */
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('open');
+}
+
+/* ── SAVE TO INVENTORY ON RESULT ── */
+const _origShowResult=showResult;
+// Override showResult to also save to inventory
+const _showResultOrig=showResult;
+
+selectFormat('poster');
+buildStep3();
+initUser();
+updateInvCount();
+
+// Patch showResult to save to inventory
+const origShowResult2=showResult;
+window.showResult=function(){
+  origShowResult2();
+  // After a short delay let the canvas render, then save
+  setTimeout(()=>{
+    try{
+      const dataUrl=document.getElementById('resultCanvas').toDataURL('image/png');
+      saveToInventory(dataUrl,{format:state.format,brand:state.brand,style:state.style,mood:state.mood});
+    }catch(e){}
+  },600);
+};
+
+// Make create panel visible initially
+document.getElementById('viewCreate').style.display='block';
+document.getElementById('progWrap').style.display='block';
 </script>
 </body>
 </html>
